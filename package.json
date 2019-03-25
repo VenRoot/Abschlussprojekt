@@ -1,0 +1,25 @@
+{
+  "name": "abschlussprojekt",
+  "version": "1.0.0",
+  "description": "Uno 2BKI2/2 NodeJS",
+  "main": "start.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "Markus Löffler",
+  "license": "ISC",
+  "devDependencies": {
+    "bootstrap": "^4.3.1",
+    "electron": "^4.1.1",
+    "jquery": "^1.9.1",
+    "js-md5": "^0.7.3",
+    "mysql2": "^1.6.5",
+    "node-jquery": "^0.1.0",
+    "popper.js": "^1.14.7"
+  },
+  "dependencies": {
+    "npm": "^6.9.0",
+    "reverse-md5": "0.0.4"
+  }
+}

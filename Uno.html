@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html id="html" lang="en" dir="ltr">
+  <head>
+
+    <link rel="stylesheet" href="./css/master.css">
+    <link rel="stylesheet" href="./css/Uno.css">
+    <script src="./node_modules/popper.js/dist/popper.js"></script>
+    <script src="./node_modules/jQuery/lib/node-jquery.js"></script>
+    <script src="./js/mysql.js" charset="utf-8"></script>
+
+    <!-- <script src="./js/jQuery/popper.js"></script> -->
+    <script src="./js/jQuery/jQuery.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
+
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+    <title>Uno - Abschlussprojekt</title>
+  </head>
+  <body>
+    <div id="hi"></div>
+
+    <button type="button" id="UnoLog" onclick="LOG();"class="btn btn-danger btn-block"name="button">LOG</button>
+    <button type="button" id="startUno" class="btn btn-danger" onclick="OpenUno();" name="button">Starten</button>
+
+    <div id="UNOSCREEN">
+      <div id="StapelScreen">
+        <div id="UnoStapel"></div>
+        <button type="button" class="btn btn-danger" onclick="KarteZiehen();" id="Ziehen" name="button">Karte ziehen!</button> <br>
+        <button type="button" class="btn btn-success" id="KarteLegen" onclick="LegenLegen();"name="button">Karte legen!</button> <br>
+        <input type="number" id="Kartennummer" placeholder="Kartennummer"> <br>
+        <button type="button" class="btn btn-dark" id="RundeBeenden"onclick="weiter();"name="button">Runde beenden</button>
+        <div id="FARBWUNSCH_WAHL">
+          <br>
+          Wähle eine Farbe aus! <br>
+          <button type="button" class="btn btn-danger" onclick='WunschRot();' name="button">Rot</button>
+          <button type="button" class="btn btn-warning" onclick='WunschGelb();' name="button">Gelb</button> <br>
+          <button type="button" class="btn btn-success" onclick='WunschGrün();' name="button">Grün</button>
+          <button type="button" class="btn btn-primary" onclick='WunschBlau();' name="button">Blau</button>
+        </div>
+        <div id="FARBWUNSCH_WAHLPLUS4">
+          <br>
+          Wähle eine Farbe aus! <br>
+          <button type="button" class="btn btn-danger" onclick='WunschRotPlus4();' name="button">Rot</button>
+          <button type="button" class="btn btn-warning" onclick='WunschGelbPlus4();' name="button">Gelb</button> <br>
+          <button type="button" class="btn btn-success" onclick='WunschGrünPlus4();' name="button">Grün</button>
+          <button type="button" class="btn btn-primary" onclick='WunschBlauPlus4();' name="button">Blau</button>
+        </div>
+      </div>
+      <div id="SPIELSCREEN">
+        <button id="Spieler2NameFeld" type="button" class="btn btn-warning btn-block" name="button">Karten von </button>
+        <div id="UNOSPIELER2SCREEN">
+
+        </div>
+
+        <div id="Trennwand">
+          <button id="Spieler1NameFeld" type="button" class="btn btn-warning btn-block" name="button">Karten von </button>
+        </div>
+        <div id="UNOSPIELER1SCREEN">
+
+        </div>
+
+
+      </div>
+    </div>
+    <button type="button" class="btn btn-danger" onclick="document.location.href='./index.html'" id="HM" name="button">Zurück zum Hauptmenü</button>
+    <div id="LOG">
+      Hier wird das Spielgeschehen dokumentiert! <br>
+    </div>
+
+
+    <button type="button" id="Tipps" class="btn btn-danger" onclick="Tipp();" name="button">Tipp: Du kannst diesen Button klicken oder warten, um weitere Tipps zu erhalten!</button>
+    <script type="text/javascript">
+      $("#UNOSCREEN").hide();
+
+    </script>
+    <script src="./js/main.js"></script>
+    <!-- <script src="./js/Hauptmenü.js"></script> -->
+    <script src="./js/Uno.js"></script>
+    <script type="text/javascript">
+    $(document).ready( async function()
+  {
+
+    $("#Formular").hide();
+
+    //await Load();
+    await Sleep(10);
+    Load();
+    await Sleep(200);
+    Abfrage();
+  });
+
+    </script>
+  </body>
+  <div id="Formular">
+    Name: <input id="inputname" type="text" name="">
+    <button type="button" class="btn btn-info" onclick="Senden(document.getElementById('inputname').value,'Uno',Spieler2Karten.length,won);" name="button">Abschicken</button>
+  </div>
+</html>

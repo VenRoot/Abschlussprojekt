@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html id="html" lang="de" dir="ltr">
+  <head>
+    <link rel="stylesheet" href="./css/Kniffel.css">
+    <link rel="stylesheet" href="./css/master.css">
+    <script src="./node_modules/popper.js/dist/popper.js"></script>
+    <script src="./node_modules/jQuery/lib/node-jquery.js"></script>
+    <!-- <script src="./node_modules/jQuery/lib/node-jquery.js"></script> -->
+
+    <!-- <script src="./js/jQuery/popper.js"></script> -->
+    <script src="./js/jQuery/jQuery.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
+
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+    <title>Kniffel - Abschlussprojekt</title>
+  </head>
+  <body id="Main">
+    <button type="button" id="Back" class="btn btn-danger" onclick="document.location.href='./index.html'" name="button">Zurück zum Hauptmenü</button>
+    <table class="tg" id="table1">
+    <tr class="tr">
+      <th class="tg-0lax">Würfel</th>
+      <th class="tg-0lax">Punkte</th>
+      <th id="Spieler1Name" class="tg-0lax">Spieler 1</th>
+      <th id="Spieler2Name" class="tg-0lax">Spieler 2</th>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Zahl1"> <font color =#f70000>1</font></td>
+      <td class="tg-0lax">nur Einser zählen</td>
+      <td class="tg-0lax" name="Feld" tag="OwO" id="Zahl1SP1"></td>
+      <td class="tg-0lax" name="Feld" id="Zahl1SP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Zahl2"><font color =#f70000>2</font></td>
+      <td class="tg-0lax">nur Zweier zählen</td>
+      <td class="tg-0lax" name="Feld" id="Zahl2SP1"></td>
+      <td class="tg-0lax" name="Feld" id="Zahl2SP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Zahl3"><font color =#f70000>3</font></td>
+      <td class="tg-0lax">nur Dreier zählen</td>
+      <td class="tg-0lax" name="Feld" id="Zahl3SP1"></td>
+      <td class="tg-0lax" name="Feld" id="Zahl3SP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Zahl4"><font color =#f70000>4</font></td>
+      <td class="tg-0lax">nur Vierer zählen</td>
+      <td class="tg-0lax" name="Feld" id="Zahl4SP1"></td>
+      <td class="tg-0lax" name="Feld" id="Zahl4SP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Zahl5"><font color =#f70000>5</font></td>
+      <td class="tg-0lax">nur Fünfer zählen</td>
+      <td class="tg-0lax" name="Feld" id="Zahl5SP1"></td>
+      <td class="tg-0lax" name="Feld" id="Zahl5SP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Zahl6"><font color =#f70000>6</font></td>
+      <td class="tg-0lax">nur Sechser zählen</td>
+      <td class="tg-0lax" name="Feld" id="Zahl6SP1"></td>
+      <td class="tg-0lax" name="Feld" id="Zahl6SP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax"> <font color =#f70000>gesamt</font> </td>
+      <td class="tg-baqh">-&gt;</td>
+      <td class="tg-0lax" name="Feld" id="gesSP1"></td>
+      <td class="tg-0lax" name="Feld" id="gesSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax"><font color =#f70000>Bonus bei 63 oder mehr</font></td>
+      <td class="tg-baqh">plus 35</td>
+      <td class="tg-0lax" name="Feld" id="BonSP1"></td>
+      <td class="tg-0lax" name="Feld" id="BonSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax"><font color =#f70000>gesamt oberer Teil</font></td>
+      <td class="tg-baqh">-&gt;</td>
+      <td class="tg-0lax" name="Feld" id="gesOSP1"></td>
+      <td class="tg-0lax" name="Feld" id="gesOSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax">-------------------------------</td>
+      <td class="tg-0lax">-------------------------</td>
+      <td class="tg-0lax"></td>
+      <td class="tg-0lax"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Dreierpasch" ><font color =#f70000>Dreierpasch</font></td>
+      <td class="tg-0lax">alle Augen zählen</td>
+      <td class="tg-0lax" name="Feld" id="DPSP1"></td>
+      <td class="tg-0lax" name="Feld" id="DPSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Viererpasch" ><font color =#f70000>Viererpasch</font></td>
+      <td class="tg-0lax">alle Augen zählen</td>
+      <td class="tg-0lax" name="Feld" id="VPSP1"></td>
+      <td class="tg-0lax" name="Feld" id="VPSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="FullHouse" ><font color =#f70000>Full-House</font></td>
+      <td class="tg-0lax">25 Punkte</td>
+      <td class="tg-0lax" name="Feld" id="FHSP1"></td>
+      <td class="tg-0lax" name="Feld" id="FHSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="KleineStraße" ><font color =#f70000>Kleine Straße</font></td>
+      <td class="tg-0lax">30 Punkte</td>
+      <td class="tg-0lax" name="Feld" id="KSSP1"></td>
+      <td class="tg-0lax" name="Feld" id="KSSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="GroßeStraße" ><font color =#f70000>Große Straße</font></td>
+      <td class="tg-0lax">40 Punkte</td>
+      <td class="tg-0lax" name="Feld" id="GSSP1"></td>
+      <td class="tg-0lax" name="Feld" id="GSSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Kniffel"><font color =#f70000>Kniffel</font></td>
+      <td class="tg-0lax">50 Punkte</td>
+      <td class="tg-0lax" name="Feld" id="KSP1"></td>
+      <td class="tg-0lax" name="Feld" id="KSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax" id="Chance"><font color =#f70000>Chance</font></td>
+      <td class="tg-0lax">alle Augen zählen</td>
+      <td class="tg-0lax" name="Feld" id="CSP1"></td>
+      <td class="tg-0lax" name="Feld" id="CSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax">gesamt unterer Teil</td>
+      <td class="tg-0lax">-&gt;</td>
+      <td class="tg-0lax" name="Feld" id="gesUSP1"></td>
+      <td class="tg-0lax" name="Feld" id="gesUSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax">gesamt oberer Teil</td>
+      <td class="tg-0lax">-&gt;</td>
+      <td class="tg-0lax" name="Feld" id="gesOSP1"></td>
+      <td class="tg-0lax" name="Feld" id="gesOSP2"></td>
+    </tr>
+    <tr class="tr">
+      <td class="tg-0lax">Endsumme</td>
+      <td class="tg-0lax">-&gt;</td>
+      <td class="tg-0lax" name="Feld" id="ESSP1"></td>
+      <td class="tg-0lax" name="Feld" id="ESSP2"></td>
+    </tr>
+  </table>
+  <button type="button" class="btn btn-info" onclick="Fertig();" name="button">Fertig</button>
+  <div id="VersuchAnzahl">
+    Anzahl Versuche = <input id="Versuch" style="width: 10%;" type="number" disabled>
+  </div>
+  <script type="text/javascript">
+  $( document ).ready(function() {
+    if(confirm("Methode 2 verwenden? (Empfohlen, Methode 0 wird nicht mehr unterstützt)"))
+  {
+      Methode = 2;
+  } else { Methode = 0; MethodeNull(); }
+});
+  </script>
+
+  <input type="number" class="Ergebnis" onclick="Save1();" id="KErgebnis1" disabled>
+  <input type="number" class="Ergebnis" onclick="Save2();" id="KErgebnis2" disabled>
+  <input type="number" class="Ergebnis" onclick="Save3();" id="KErgebnis3" disabled>
+  <input type="number" class="Ergebnis" onclick="Save4();" id="KErgebnis4" disabled>
+  <input type="number" class="Ergebnis" onclick="Save5();" id="KErgebnis5" disabled>
+
+  <div id="savenum" class="span">
+    <button type="button" class="btn btn-success owo" onclick="Save1f();" name="button">Erstes Feld speichern</button><br>
+    <button type="button" class="btn btn-success owo" onclick="Save2f();" name="button">Zweites Feld speichern</button><br>
+    <button type="button" class="btn btn-success owo" onclick="Save3f();" name="button">Drittes Feld speichern</button><br>
+    <button type="button" class="btn btn-success owo" onclick="Save4f();" name="button">Viertes Feld speichern</button><br>
+    <button type="button" class="btn btn-success owo" onclick="Save5f();" name="button">Fünftes Feld speichern</button><br>
+  </div>
+
+  <div id="relnum" class="span">
+    <button type="button" class="btn btn-danger owo" onclick="Release1f();" name="button">Erstes Feld freigeben</button><br>
+    <button type="button" class="btn btn-danger owo" onclick="Release2f();" name="button">Zewites Feld freigeben</button><br>
+    <button type="button" class="btn btn-danger owo" onclick="Release3f();" name="button">Drittes Feld freigeben</button><br>
+    <button type="button" class="btn btn-danger owo" onclick="Release4f();" name="button">Viertes Feld freigeben</button><br>
+    <button type="button" class="btn btn-danger owo" onclick="Release5f();" name="button">Fünftes Feld freigeben</button><br>
+  </div>
+
+  <!-- <div id="savenum2">
+    Für das 3. Feld <br>
+    <button type="button" class="btn btn-success owo" onclick="Save11();" name="button">Erstes Feld speichern</button><br>
+    <button type="button" class="btn btn-success owo" onclick="Save12();" name="button">Zweites Feld speichern</button><br>
+    <button type="button" class="btn btn-success owo" onclick="Save13();" name="button">Drittes Feld speichern</button><br>
+    <button type="button" class="btn btn-success owo" onclick="Save14();" name="button">Viertes Feld speichern</button><br>
+    <button type="button" class="btn btn-success owo" onclick="Save15();" name="button">Fünftes Feld speichern</button><br>
+  </div> -->
+
+  <!-- <input type="number" class="Ergebnis" onclick="Save21 = true;" id="KErgebnis1Saved" disabled>
+  <input type="number" class="Ergebnis" onclick="Save22 = true;" id="KErgebnis2Saved" disabled>
+  <input type="number" class="Ergebnis" onclick="Save23 = true;" id="KErgebnis3Saved" disabled>
+  <input type="number" class="Ergebnis" onclick="Save24 = true;" id="KErgebnis4Saved" disabled>
+  <input type="number" class="Ergebnis" onclick="Save25 = true;" id="KErgebnis5Saved" disabled>
+
+  <input type="number" class="Ergebnis" id="KErgebnis1Saved2" disabled>
+  <input type="number" class="Ergebnis" id="KErgebnis2Saved2" disabled>
+  <input type="number" class="Ergebnis" id="KErgebnis3Saved2" disabled>
+  <input type="number" class="Ergebnis" id="KErgebnis4Saved2" disabled>
+  <input type="number" class="Ergebnis" id="KErgebnis5Saved2" disabled> -->
+
+  <!-- <div class="Ergebnis" id="KErgebnisZahl1">1</div>
+  <div class="Ergebnis" id="KErgebnisZahl2">2</div>
+  <div class="Ergebnis" id="KErgebnisZahl3">3</div>
+  <div class="Ergebnis" id="KErgebnisZahl4">4</div>
+  <div class="Ergebnis" id="KErgebnisZahl5">5</div> -->
+  <button type="button" id="StopButton" onclick="Stop();" class="btn btn-danger" name="button">Stop</button>
+  <button type="button" id="WürfelButton" onclick="Würfeln();" class="btn btn-success" name="button">Würfeln</button>
+
+  <!-- <button type="button" class="btn btn-danger" id="Button1" name="button">1</button>
+  <button type="button" class="btn btn-danger" id="Button2" name="button">2</button>
+  <button type="button" class="btn btn-danger" id="Button3" name="button">3</button>
+  <button type="button" class="btn btn-danger" id="Button4" name="button">4</button>
+  <button type="button" class="btn btn-danger" id="Button5" name="button">5</button>
+  <button type="button" class="btn btn-danger" id="Button6" name="button">6</button>
+  <button type="button" class="btn btn-danger" id="ButtonDreierPasch" name="button">Dreierpasch</button>
+  <button type="button" class="btn btn-danger" id="ButtonViererPasch" name="button">Viererpasch</button>
+  <button type="button" class="btn btn-danger" id="ButtonFullHouse" name="button">Full-House</button>
+  <button type="button" class="btn btn-danger" id="ButtonKleineStraße" name="button">Kleine Straße</button>
+  <button type="button" class="btn btn-danger" id="ButtonGroßeStraße" name="button">Große Straße</button>
+  <button type="button" class="btn btn-danger" id="ButtonKniffel" name="button">Kniffel</button>
+  <button type="button" class="btn btn-danger" id="ButtonChance" name="button">Chance</button> -->
+
+
+    <script src="./js/main.js"></script>
+    <script src="./js/Hauptmenü.js"></script>
+    <script src="./js/Kniffel.js"></script>
+    <script src="./js/sql.js"></script>
+    <script type="text/javascript">
+    $(document).ready( async function()
+  {
+    await Load();
+    await Sleep(10);
+    await Load();
+  });
+
+    </script>
+  </body>
+</html>

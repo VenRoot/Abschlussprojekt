@@ -1,0 +1,53 @@
+Wcihtig:
+
+os.userInfo().username = Windows-Nutzername
+os.hostname = Host-Name
+os.networkInterfaces().WiFi[1].address = IP-Adresse WLAN;
+
+
+
+Allgemein:
+
++Dunkler Modus implementiert, welcher die Hintergrundfarbe dunkler setzt.
++Dunkler Modus schreibt nun in eine Datei, damit die Spiele diesen anwenden können. Der Modus ist permanent, d.h. nach Reset lädt der Modus seinen letzten Zustand.
++Highscore, welcher in allen Apps angezeigt und im Hauptmenü gelistet werden kann (MySQL)
+
++Der dunkle Modus ist nun individuell. Er kann jede beliebige Farbe per RGB-Tabelle an sich nehmen. Siehe Kniffel-Features
+
+
+Uno:
+
++Man kann sich in die Bestenliste eintragen lassen!
+!!WICHTIG!!! BUG: Kartenfarbe kommt manchmal auf 5 !Behoben!
+
+
+Kniffel:
+
++Neues System, welches das alte komplett überschreibt, um die Erfahrung des Spiels auf verschiedensten Bildschirmauflösungen zu verbessern -> Methode 2
+
++ Wenn dunkleres Theme angewendet, wird die Schrift heller, um besser lesen zu können
+
+
+
+
+Geplante Features:
+
+*Spieler können Benutzerkonten erstellen, welche erlauben, die einzelen Highscores des Spielers auszugeben (Login-Funktion)
+*Highscores können per Klick auf die Bereiche (Name, Highscore, ID, Spiel) sortiert werden (Standard: ID)
+
+--------------------------------------------------------------------
+|*Sprachskript, welches jeden Text in eine andere Sprache übersetzt|
+--------------------------------------------------------------------
+
+Fehlende Features (wichtig):
+
+*BlackJack (komplett)
+*Kniffel untere Zeilen
+
+
+BUG?: Man kann in Kniffel, wenn man bereits eingetragen und noch Versuche hat, den Wert überschreiben
+
+
+#Insgesamt existieren 3852 Zeilen Code in meinem Projekt, welche von mir von Hand geschrieben wurden. Dazu zählen sowohl aktive, als auch inaktive Features, welche ich wieder herausgenommen, aber nicht gelöscht habe. Gelöschte können nicht gezählt werden!
+
+In GTA V gibt es 100 Millionen Zeilen Code. Es war 7 Jahre lang in Entwicklung. 139 Programmierer. Ein vollkommen ausgebildeter Programmierer hätte in 5 Monaten 42822 Zeilen Code geschrieben, ohne Bestätigung, dass alles per Hand geschrieben wurde.

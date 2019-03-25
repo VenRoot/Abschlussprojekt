@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <link rel="stylesheet" href="./css/Labyrinth.css">
+    <link rel="stylesheet" href="./css/dimmer.css">
+    <link rel="stylesheet" href="./css/dimmer.min.css">
+    <!-- <script src="./node_modules/popper.js/dist/popper.js"></script> -->
+    <!-- <script src="./node_modules/jQuery/lib/node-jquery.js"></script> -->
+    <meta charset="utf-8">
+    <title>Labyrinth - Abschlussprojekt</title>
+  </head>
+  <body class="" onkeypress="start();" id="body">
+    <!--
+    <div id="drag-1" class="draggable"></div>
+    <div onmouseover="ResetGame();" class="wall" id="wall1"></div>
+    <div onmouseover="ResetGame();" class="wall" id="wall2"></div>
+    <div onmouseover="ResetGame();" class="wall" id="wall3"></div>
+-->
+
+<!-- <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <metadata><?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.6-c142 79.160924, 2017/07/13-01:06:39        ">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""/>
+   </rdf:RDF>
+</x:xmpmeta>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?xpacket end="w"?></metadata>
+<image id="pixel" width="1920" height="1080" xlink:href="data:img/png;base64,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"/>
+</svg>  -->
+
+    <script src="https://cdn.jsdelivr.net/npm/interactjs@1.3.4/dist/interact.min.js"></script>
+    <link rel="stylesheet" href="./css/master.css">
+
+    <!-- <script src="./js/jQuery/jQuery.js"></script> -->
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="./js/dimmer/index.js"></script>
+    <script src="./js/dimmer/dimmer.js"></script>
+    <script src="./js/dimmer/dimmer.min.js"></script>
+    <script>
+    import svgjs from "svg.js";
+    </script>
+    <script src="./node_modules/@shopify/draggable/lib/draggable.bundle.js"></script>
+
+    <script src="./js/Labyrinth.js"></script>
+    <script type="text/javascript">
+       import draggable from "draggable";
+       import "jquery";
+    </script>
+    <div draggable="true">
+      Hewwp
+    </div>
+    <!-- <svg width="300" class="draggable" height="300">
+
+      <circle id="circle1" class="draggable" draggable cx="30" cy="30" r="10" fill="red"/>
+      <circle id="circle2" class="draggable" cx="300" cy="30" r="10" fill="green"/>
+
+    </svg> -->
+  </body>
+
+
+</html>

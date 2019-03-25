@@ -1,0 +1,56 @@
+html, body {margin: 0; height: 100%; overflow: hidden}
+
+.wall {
+  background-color: black;
+  position: absolute;
+}
+
+#circle1
+{
+  position: absolute;
+  top: 10%;
+  left:10%;
+}
+
+#wall1 { /* Wand hinter Spawn*/
+
+  height: 100%;
+  width: 3.125%;
+  left: 0%;
+}
+
+#wall2 { /*  */
+
+  height: 31.26%;
+  width: 28.12%;
+  left: 0%;
+  top: 0%;
+}
+
+#wall3 {
+
+  height: 11.1%;
+  width: 100%;
+  top: 0%;
+  left: 0%;
+}
+
+#wall4 {
+
+  height: 10%;
+  left: 0%;
+}
+
+#drag-1 {
+  position: fixed;
+  top: 20%;
+  width: -100%;
+  height: -100%;
+  background-color: #29e;
+  color: white;
+  border-radius: 20%;
+  padding: 4%;
+  user-select: none;
+  -webkit-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+}

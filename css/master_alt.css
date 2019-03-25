@@ -1,0 +1,45 @@
+#Name {
+  position: absolute;
+  top: 13%;
+  left: 40%;
+}
+
+#UnoButton {
+  position: absolute;
+  top: 20%;
+  left: 40%;
+}
+
+#BJButton {
+  position: absolute;
+  top: 30%;
+  left: 40%;
+}
+
+#KniffelButton {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+}
+
+
+#Date
+{
+  position: absolute;
+  top: 90%;
+  left: 0%;
+}
+
+#EinstellungenFenster
+{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0px;
+  top: 0%;
+}
+
+#bg {
+  width: 200px;
+  height: 50px;
+}

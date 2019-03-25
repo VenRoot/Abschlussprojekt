@@ -1,0 +1,312 @@
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+
+
+.dark {
+  border: 2px solid;
+  border-color: white;
+  color: white;
+}
+
+table {
+  position: fixed;
+  top:5%;
+
+}
+
+.btn {
+   display: inline-block;
+}
+#Main
+{
+  overflow: hidden;
+  width: 2000px;
+  height: 2000px;
+}
+
+#KErgebnis
+{
+  position: absolute;
+  left: 50%;
+  width: 2.5%;
+}
+
+
+#WürfelButton
+{
+  position: absolute;
+  left: 65%;
+}
+
+#StopButton
+{
+  position: absolute;
+  left: 65%;
+}
+
+.Ergebnis
+{
+  position: absolute;
+  width: 2.5%;
+}
+
+.btn
+{
+  position: absolute;
+}
+
+#KErgebnis1
+{
+
+  left: 50%;
+}
+#KErgebnis2
+{
+  left: 53%;
+}
+#KErgebnis3
+{
+  left: 56%;
+}
+#KErgebnis4
+{
+  left: 59%;
+}
+#KErgebnis5
+{
+  left: 62%;
+}
+
+#KErgebnis1Saved
+{
+  left: 50%;
+  top: 4%;
+}
+#KErgebnis2Saved
+{
+  left: 53%;
+  top: 4%;
+}
+#KErgebnis3Saved
+{
+  left: 56%;
+  top: 4%;
+}
+#KErgebnis4Saved
+{
+  left: 59%;
+  top: 4%;
+}
+#KErgebnis5Saved
+{
+  left: 62%;
+  top: 4%;
+}
+
+#KErgebnis1Saved2
+{
+  left: 50%;
+  top: 8%;
+}
+#KErgebnis2Saved2
+{
+  left: 53%;
+  top: 8%;
+}
+#KErgebnis3Saved2
+{
+  left: 56%;
+  top: 8%;
+}
+#KErgebnis4Saved2
+{
+  left: 59%;
+  top: 8%;
+}
+#KErgebnis5Saved2
+{
+  left: 62%;
+  top: 8%;
+}
+
+
+#KErgebnisZahl1
+{
+  top: 86%;
+  left: 50.8%;
+}
+#KErgebnisZahl2
+{
+  top: 86%;
+  left: 53.8%;
+}
+#KErgebnisZahl3
+{
+  top: 86%;
+  left: 56.8%;
+}
+#KErgebnisZahl4
+{
+  top: 86%;
+  left: 59.8%;
+}
+#KErgebnisZahl5
+{
+  top: 86%;
+  left: 62.8%;
+}
+
+
+#Button1
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 9.5%;
+  left: 0.354%;
+}
+
+#Button2
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 13.6%;
+  left: 0.354%;
+}
+
+
+#Button3
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 17.9%;
+  left: 0.354%;
+}
+
+
+#Button4
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 22.1%;
+  left: 0.354%;
+}
+
+
+#Button5
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 26.3%;
+  left: 0.354%;
+}
+
+
+#Button6
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 30.5%;
+  left: 0.354%;
+}
+
+#ButtonDreierPasch
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 51.6%;
+  left: 0.354%;
+}
+
+#ButtonViererPasch
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 55.9%;
+  left: 0.354%;
+}
+
+#ButtonFullHouse
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 59.95%;
+  left: 0.354%;
+}
+
+#ButtonKleineStraße
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 64.2%;
+  left: 0.354%;
+}
+
+#ButtonGroßeStraße
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 68.5%;
+  left: 0.354%;
+}
+
+#ButtonKniffel
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 72.7%;
+  left: 0.354%;
+}
+
+#ButtonChance
+{
+  margin: 0 auto;
+  position: absolute;
+  top: 76.8%;
+  left: 0.354%;
+}
+
+
+#VersuchAnzahl
+{
+  position: absolute;
+  top: 12%;
+  left: 50%;
+}
+
+#savenum
+{
+  position: absolute;
+  left: 70%;
+  top: 6%;
+}
+
+#relnum
+{
+  position: absolute;
+  left: 70%;
+  top: 20%;
+}
+
+#savenum2
+{
+  position: absolute;
+  left: 80%;
+  top: 6%;
+}
+
+.owo
+{
+  font-size-adjust: auto;
+  font-size: 10%;
+  height: 25%;
+}
+
+.owo2
+{
+  font-size-adjust: auto;
+  font-size: 10%;
+  height: 25%;
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html id="html" lang="en" dir="ltr">
+  <head>
+    <link rel="stylesheet" href="./css/table.css">
+    <link rel="stylesheet" href="./css/master.css">
+
+    <script type="text/javascript">
+      //import popperjs from "popper.js";
+      // const $ = require('jquery');
+      // import jscolor from "jscolor.js";
+    </script>
+    <script src="./node_modules/popper.js/dist/popper.js"></script>
+    <script src="./node_modules/jQuery/lib/node-jquery.js"></script>
+    <script src="./js/jscolor.js" charset="utf-8"></script>
+
+    <script src="./js/jQuery/popper.js"></script>
+    <script src="./js/jQuery/jQuery.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
+
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./css/fullpage.min.css">
+    <title>Abschlussprojekt</title>
+  </head>
+  <body>
+    <div id="HMScreen">
+      <button type="button" class="btn btn-danger" id="SwitchButton" onclick="switchToSQL();" name="button">Einstellungen werden in einer Datei gespeichert. Klicke, um zu ändern</button>
+      <button type="button" class="btn btn-danger" id="Name" name="button">Ven</button>
+      <button type="button" class="btn btn-success" id="UnoButton" onclick="location.href='./Uno.html';" name="button">Uno</button>
+      <button type="button" class="btn btn-success" id="KniffelButton" onclick="location.href='./Kniffel.html'" name="button">Kniffel</button>
+      <button type="button" class="btn btn-success" id="BJButton" onclick="location.href='./BlackJack.html'" name="button">Black Jack</button>
+      <br> <br> <br>
+      <button type="button" class="btn btn-danger" id="SingleplayerButton" onclick="Switch();" name="button">Singleplayer</button>
+      <button type="button" class="btn btn-dark" id="SD" onclick="SwitchDark();" name="button">Dunkler Modus</button>
+      <button type="button" class="btn btn-danger" onclick="EditDark();" name="button">Dunkler Modus bearbeiten!</button>
+      <input id="foo" class="jscolor" value="0" autocomplete="off" style="background-color: rgb(204, 68, 153); color: rgb(255, 255, 255);">
+      <button type="button" id="Übernehmen" onclick="Übernehmen();" name="button">Übernehmen</button>
+      <table id="table" class="tg">
+      </table>
+      <!-- <br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>. -->
+
+    </div>
+    <script src="./js/fullpage.min.js" charset="utf-8"></script>
+    <script src="./js/Multiplayer.js" charset="utf-8"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/Hauptmenü.js"></script>
+    <script src="./js/mysql.js" charset="utf-8"></script>
+
+    <script type="text/javascript">
+    $(document).ready( async function()
+  {
+    await Sleep(100);
+     $("#foo").hide();
+     $("#Übernehmen").hide();
+    await Sleep(5);
+    await Load();
+    await Sleep(1000);
+    await generateTable();
+    await Sleep(1000);
+    // await Load2();
+    //
+    // if (DarkMode) {
+    //
+    //
+    //   SD.setAttribute("class", "btn btn-light");
+    //   SD.innerHTML = "Heller Modus";
+    // }
+    // else {
+    //   SD.setAttribute("class", "btn btn-dark");
+    //   SD.innerHTML = "Dunkler Modus";
+    // }
+    //
+    // //await document.getElementById("foo").value = DunklerModusFarbe;
+  });
+
+    </script>
+    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.6/ScrollMagic.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.6/plugins/debug.addIndicators.min.js"></script> -->
+
+  </body>
+</html>

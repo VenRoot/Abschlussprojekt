@@ -1,0 +1,66 @@
+#startUno {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+
+/* #UnoStapel
+{
+  position: absolute;
+  top: 50%;
+  left: 90%;
+} */
+
+.tra {
+  position: absolute;
+  z-index: 2;
+  width: 140px;
+  height: 250px;
+}
+
+#LOG {
+  position: absolute;
+  top: 70%;
+  left: 30%;
+  background-color: black;
+  color: lime;
+}
+
+img {
+  height: 11%;
+  width: 11%;
+}
+
+#SPIELSCREEN
+{
+  position: absolute;
+  width: 70%;
+}
+
+#StapelScreen
+{
+  position: absolute;
+  width: 75%;
+  top: 13.5%;
+  left: 80%;
+
+}
+
+#UNOSCREEN{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+#Tipps
+{
+  position: absolute;
+  top: 60%;
+}
+
+#HM
+{
+  position: absolute;
+  top: 80%;
+}

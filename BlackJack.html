@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html id="html" lang="de" dir="ltr">
+  <head>
+    <link rel="stylesheet" href="./css/master.css">
+
+    <script src="./node_modules/popper.js/dist/popper.js"></script>
+    <script src="./node_modules/jQuery/lib/node-jquery.js"></script>
+    <script src="./js/mysql.js" charset="utf-8"></script>
+
+    <!-- <script src="./js/jQuery/popper.js"></script> -->
+    <script src="./js/jQuery/jQuery.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
+
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+    <title>BlackJack</title>
+  </head>
+  <body>
+    <button type="button" class="btn btn-danger" onclick="document.location.href='./index.html'" id="HM" name="button">Zurück zum Hauptmenü</button>
+    <button type="button" id="UnoLog" onclick="LOG();"class="btn btn-danger btn-block"name="button">LOG</button>
+    <button type="button" id="startUno" class="btn btn-danger" onclick="OpenUno();" name="button">Starten</button>
+
+    <div id="UNOSCREEN">
+      <div id="StapelScreen">
+        <div id="UnoStapel"></div>
+        <button type="button" class="btn btn-danger" onclick="KarteZiehen();" id="Ziehen" name="button">Karte ziehen!</button> <br>
+        <button type="button" class="btn btn-success" id="KarteLegen" onclick="LegenLegen();"name="button">Karte legen!</button> <br>
+        <input type="number" id="Kartennummer" placeholder="Kartennummer"> <br>
+        <button type="button" class="btn btn-dark" id="RundeBeenden"onclick="weiter();"name="button">Runde beenden</button>
+      </div>
+      <div id="SPIELSCREEN">
+        <button type="button" class="btn btn-warning btn-block" name="button">Karten von Spieler2</button>
+        <div id="UNOSPIELER2SCREEN">
+
+        </div>
+
+        <div id="Trennwand">
+          <button type="button" class="btn btn-warning btn-block" name="button">Karten von Spieler1</button>
+        </div>
+        <div id="UNOSPIELER1SCREEN">
+
+        </div>
+
+
+      </div>
+    </div>
+
+    <div id="LOG">
+      Hier wird das Spielgeschehen dokumentiert! <br>
+    </div>
+    <button type="button" id="Tipps" class="btn btn-danger" onclick="Tipp();" name="button">Tipp: Du kannst diesen Button klicken oder warten, um weitere Tipps zu erhalten!</button>
+    <script src="./js/main.js"></script>
+    <script src="./js/Hauptmenü.js"></script>
+    <script src="./js/BlackJack.js"></script>
+    <script type="text/javascript">
+    $(document).ready( async function()
+  {
+    await Load();
+    await Sleep(10);
+    await Load();
+  });
+
+    </script>
+  </body>
+</html>
