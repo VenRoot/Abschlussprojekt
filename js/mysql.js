@@ -2,26 +2,44 @@ let mysql = require("mysql2");
 
 let temp;
 let temp2;
-async function dat(Befehl) {
-  con.connect(function(err) {
-    if (err) throw err;
-    console.log("MySQL: Connected to localhost!");
-    con.query("USE abschlussprojekt;", function (err, result) {
-      if (err) throw err;
-      console.log(result);
+
+// async nur verwenden wenn Await benutzt wird!!!
+// wenn du die Funktion selbst awaiten möchtest dann immer so machen:
+function dat(Befehl) {
+
+  return new Promise((resolve, reject) => {
+
+    try {
+
+      con.connect(err => {
+        // wenn error ist dann REJECT damit der wo awaited weiß es ist was kaputt
+        if (err) return reject(err);
+        console.log("MySQL: Connected to localhost!");
+        con.query("USE abschlussprojekt;", (err, result) => {
+          // throw nur verwenden wenn du einen tcatch block hast
+          if (err) return reject(err);
+          return resolve(result);
+        });
+      })
+
+      // unnötig weil dein code niemals hier her kommen wird...
+      // con.query(Befehl, function (err, result) {
+      //   if (err) throw err;
+      //   //await Sleep(10);
+      //   temp = result;
+      // });
+      // return temp;
+
+    } catch (e) {
+      return reject (e);
+
+    } finally {
+      // immer im finally sonst gibts konflikte wenn deine query durch ist.
+      con.close();
+    }
+
+
     });
-  });
-
-  //await Sleep(100);
-
-
-  con.query(Befehl, function (err, result) {
-    if (err) throw err;
-    //await Sleep(10);
-    temp = result;
-  });
-  return temp;
-  con.close();
 }
 
 

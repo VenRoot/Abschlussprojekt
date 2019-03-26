@@ -1,0 +1,85 @@
+{
+  "extends": ["airbnb", "eslint:recommended"],
+  "plugins": ["jsx-a11y", "react"],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "globals": {
+    "window": true,
+    "fetch": true,
+    "document": true
+  },
+  "rules": {
+    "linebreak-style": ["error", "windows"],
+    "padded-blocks": [
+      "error",
+      {
+        "classes": "always"
+      }
+    ],
+    "camelcase": [
+      "error",
+      {
+        "properties": "always"
+      }
+    ],
+    "eqeqeq": ["error", "smart"],
+    "indent": [
+      "error",
+      2,
+      {
+        "MemberExpression": 0
+      }
+    ],
+    "max-len": ["error", 250],
+    "new-cap": "error",
+    "no-undef": "error",
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+    "no-unused-vars": "error",
+    "no-loop-func": "warn",
+    "accessor-pairs": [
+      "error",
+      {
+        "setWithoutGet": true
+      }
+    ],
+    "dot-notation": [
+      "error",
+      {
+        "allowPattern": "^[a-z]+(_[a-z]+)+$|^[a-z]+(-[a-z]+)+$"
+      }
+    ],
+    "semi": [
+      "error",
+      "always",
+      {
+        "omitLastInOneLineBlock": true
+      }
+    ],
+    "semi-style": ["error", "last"],
+    "consistent-return": "error",
+    "default-case": "error",
+    "prefer-spread": "error",
+    "no-extra-semi": "error",
+    "import/prefer-default-export": "off",
+    "react/jsx-filename-extension": "off",
+    "react/prefer-stateless-function": "off",
+    "react/forbid-prop-types": "off",
+    "import/extensions": "off",
+    "class-methods-use-this": "off",
+    "no-underscore-dangle": "off",
+    "complexity": "off",
+    "prefer-template": "off",
+    "spaced-comment": "off",
+    "no-console": "off",
+    "lines-around-directive": "off",
+    "linebreak-style": "off",
+    "prefer-const": "off",
+    "no-restricted-syntax": "off",
+    "strict": "off",
+    "curly": "off"
+  }
+}

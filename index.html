@@ -1,21 +1,10 @@
 <!DOCTYPE html>
 <html id="html" lang="en" dir="ltr">
   <head>
-    <link rel="stylesheet" href="./css/table.css">
-    <link rel="stylesheet" href="./css/master.css">
-    <script src="./node_modules/popper.js/dist/popper.js"></script>
-    <script src="./node_modules/jQuery/lib/node-jquery.js"></script>
-    <script src="./js/jscolor.js" charset="utf-8"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
 
-    <script src="./js/jQuery/popper.js"></script>
-    <script src="./js/jQuery/jQuery.js"></script>
-    <script src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
-
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href="./css/fullpage.min.css">
-    <link rel="stylesheet" href="./css/rainbowbutton.css">
-    <script src="./js/main.js"></script>
+    <link rel="stylesheet" href="./css/main.scss" />
     <title>Abschlussprojekt</title>
   </head>
   <body>
@@ -23,22 +12,18 @@
       <div id="fullpage">
         <div class="section">
           <h1>Markus Löffler</h1>
-          <br>
+          <br />
           <h2>GameOS</h2>
-          <br>
-          <h3 id="usernamefeld">Willkommen, </h3>
-          <button type="button" class="btn btn-dark" id="SD" onclick="SwitchDark();" name="button">Dunkler Modus</button>
-          <button type="button" id="SDE" class="btn btn-danger" onclick="EditDark();" name="button">Dunkler Modus bearbeiten!</button>
-          <input id="foo" class="jscolor" value="0" autocomplete="off" style="background-color: rgb(204, 68, 153); color: rgb(255, 255, 255);">
-          <button type="button" id="Übernehmen" onclick="Übernehmen();" name="button">Übernehmen</button>
+          <br />
+          <h3 id="usernamefeld">Willkommen,</h3>
+          <button type="button" class="btn btn-dark" id="SD" onclick="SwitchDark();" name="button">Dunkler Modus</button> <button type="button" id="SDE" class="btn btn-danger" onclick="EditDark();" name="button">Dunkler Modus bearbeiten!</button>
+          <input id="foo" class="jscolor" value="0" autocomplete="off" style="background-color: rgb(204, 68, 153); color: rgb(255, 255, 255);" /> <button type="button" id="Übernehmen" onclick="Übernehmen();" name="button">Übernehmen</button>
           <button type="button" id="rainbowbutton" onclick="toggleRainbow();" name="button">RAINBOW</button>
 
           <div class="span" id="anmeldediv">
-            <button type="button" onclick="prelogin();" class="btn btn-danger"name="button">Anmelden</button>
-            <button type="button" oncanplay="register();"class="btn btn-success" name="button">Registrieren</button>
-            <br>
-            <input class="input1" id="usernameinput" type="text" placeholder="Benutzername" name="username"> <br>
-            <input class="input1" id="passwordinput" type="password" placeholder="Passwort" name="password">
+            <button type="button" onclick="prelogin();" class="btn btn-danger" name="button">Anmelden</button> <button type="button" oncanplay="register();" class="btn btn-success" name="button">Registrieren</button> <br />
+            <input class="input1" id="usernameinput" type="text" placeholder="Benutzername" name="username" /> <br />
+            <input class="input1" id="passwordinput" type="password" placeholder="Passwort" name="password" />
           </div>
 
           <table class="tg">
@@ -63,82 +48,56 @@
               <td id="TableServer4" title="Keine Spieler">0/2 Spieler</td>
             </tr>
           </table>
-
         </div>
         <div class="section">
           <h1>Uno</h1>
-          <br>
-          <h2>Spiele gegen deinen Kumpel um die Wette! <br> Wer wird zuerst alle Karten ablegen können?</h2>
-          <br>
+          <br />
+          <h2>
+            Spiele gegen deinen Kumpel um die Wette! <br />
+            Wer wird zuerst alle Karten ablegen können?
+          </h2>
+          <br />
           <h3>Spielzeit: 5-10 Minuten</h3>
-          <input type="text" id="Spieler1NameFeldHM" placeholder="Name von Spieler 1"> <br>
-          <input type="text" id="Spieler2NameFeldHM" placeholder="Name von Spieler 2"> <br>
+          <input type="text" id="Spieler1NameFeldHM" placeholder="Name von Spieler 1" /> <br />
+          <input type="text" id="Spieler2NameFeldHM" placeholder="Name von Spieler 2" /> <br />
           <button type="button" class="btn btn-success" id="UnoButton" onclick="UnoStartHM();" name="button">Jetzt spielen!</button>
-          <table id="UnoTable" class="tg">
-
-          </table>
+          <table id="UnoTable" class="tg"></table>
         </div>
         <div class="section">
-          <h1>Highscores</h1> <br>
-          <table id="table" class="tg">
-          </table>
+          <h1>Highscores</h1>
+          <br />
+          <table id="table" class="tg"></table>
         </div>
         <div class="section">
           <table class="tg">
-  <tr>
-    <td>Benutzername</td>
-    <td id="TableUsername">Benutzername konnte nicht angezeigt werden</td>
-  </tr>
-  <tr>
-    <td>Kernel</td>
-    <td id="TableSystem">Kernel wurde nicht erkannt</td>
-  </tr>
-  <tr>
-    <td>IP-Adresse</td>
-    <td id="TableIP">0.0.0.0</td>
-  </tr>
-  <tr>
-    <td>Architektur</td>
-    <td id="TableArch">Architektur nicht erkannt</td>
-  </tr>
-  <tr>
-    <td>CPU</td>
-    <td id="TableCPU">CPU nicht erkannt</td>
-  </tr>
-</table>
+            <tr>
+              <td>Benutzername</td>
+              <td id="TableUsername">Benutzername konnte nicht angezeigt werden</td>
+            </tr>
+            <tr>
+              <td>Kernel</td>
+              <td id="TableSystem">Kernel wurde nicht erkannt</td>
+            </tr>
+            <tr>
+              <td>IP-Adresse</td>
+              <td id="TableIP">0.0.0.0</td>
+            </tr>
+            <tr>
+              <td>Architektur</td>
+              <td id="TableArch">Architektur nicht erkannt</td>
+            </tr>
+            <tr>
+              <td>CPU</td>
+              <td id="TableCPU">CPU nicht erkannt</td>
+            </tr>
+          </table>
         </div>
       </div>
     </div>
 
-    <script src="./js/fullpage.min.js" charset="utf-8"></script>
-    <script src="./js/page.js" charset="utf-8"></script>
     <!-- <script src="./js/Multiplayer.js" charset="utf-8"></script> -->
 
-    <script src="./js/Hauptmenü.js"></script>
-    <script src="./js/mysql.js" charset="utf-8"></script>
-
-    <script type="text/javascript">
-    $(document).ready( async function()
-  {
-    document.getElementById("usernamefeld").innerHTML+= Benutzername;
-    document.getElementById("Spieler1NameFeldHM").value = Benutzername;
-    await Sleep(100);
-    //await generateTable();
-    await CPUTable();
-    console.warn("CPUTable");
-     $("#foo").hide();
-     $("#Übernehmen").hide();
-    await Sleep(50);
-    await Load();
-    console.warn("Load");
-    await Sleep(10);
-    await Load3();
-    ServerTable();
-    console.warn("ServerTable");
-    console.warn("generateTable");
-    await dat("SELECT * FROM users WHERE username = 'h';")
-   });
-    </script>
+    <script src="./js/index.js"></script>
 
   </body>
 </html>
