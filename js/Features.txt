@@ -11,15 +11,21 @@ Allgemein:
 +Dunkler Modus implementiert, welcher die Hintergrundfarbe dunkler setzt.
 +Dunkler Modus schreibt nun in eine Datei, damit die Spiele diesen anwenden können. Der Modus ist permanent, d.h. nach Reset lädt der Modus seinen letzten Zustand.
 +Highscore, welcher in allen Apps angezeigt und im Hauptmenü gelistet werden kann (MySQL)
++Spieler können Benutzerkonten erstellen, welche erlauben, die einzelen Highscores des Spielers auszugeben (Login-Funktion) ERFÜLLT!
 
 +Der dunkle Modus ist nun individuell. Er kann jede beliebige Farbe per RGB-Tabelle an sich nehmen. Siehe Kniffel-Features
 
 
++Einstellungen werden nun als JSON in "/js/settings.JSON" gespeichert! Performance wurde verbessert und stabilisiert
+
 Uno:
 
+
 +Man kann sich in die Bestenliste eintragen lassen!
++Man kann die Karten nun anklicken, um sie auszuwählen
 !!WICHTIG!!! BUG: Kartenfarbe kommt manchmal auf 5 !Behoben!
 
++Performance Boost. Karten laden nun schneller!
 
 Kniffel:
 
@@ -32,20 +38,19 @@ Kniffel:
 
 Geplante Features:
 
-*Spieler können Benutzerkonten erstellen, welche erlauben, die einzelen Highscores des Spielers auszugeben (Login-Funktion)
+*Gespeicherte Daten während des Spiels werden mit einem Hash überprüft, um Cheaten zu untersagen
 *Highscores können per Klick auf die Bereiche (Name, Highscore, ID, Spiel) sortiert werden (Standard: ID)
 
 --------------------------------------------------------------------
 |*Sprachskript, welches jeden Text in eine andere Sprache übersetzt|
 --------------------------------------------------------------------
 
-Fehlende Features (wichtig):
-
-*BlackJack (komplett)
-*Kniffel untere Zeilen
-
 
 BUG?: Man kann in Kniffel, wenn man bereits eingetragen und noch Versuche hat, den Wert überschreiben
+
+BUG: MySQL Query nicht perfekt. Siehe UnoStart Multiplayer BUG BEHOBEN!!!!! 25.4.2019
+
+BUG: Uno.JS:57
 
 
 #Insgesamt existieren 3852 Zeilen Code in meinem Projekt, welche von mir von Hand geschrieben wurden. Dazu zählen sowohl aktive, als auch inaktive Features, welche ich wieder herausgenommen, aber nicht gelöscht habe. Gelöschte können nicht gezählt werden!

@@ -1,21 +1,170 @@
-// var babel = require("@babel/core");
-//import { transform } from "@babel/core";
-// import * as babel from "@babel/core";
-const fs = require("fs");
+const PromiseFtp = require('promise-ftp');
+const ftp = new PromiseFtp();
+const JSAlert = require("js-alert");
+const $ = require('jquery');
+
+const ping = require('ping');
+
+
+var useJSON = false;
+//import $ from 'jquery';
+//import jQuery from 'jquery';
+const jQuery = require('jquery');
+window.$ = $;
+window.jQuery = jQuery;
 const os = require('os');
 const ifaces = os.networkInterfaces();
 const md5 = require('js-md5');
-const ReverseMd5 = require('reverse-md5');
+//const ReverseMd5 = require('reverse-md5');
+//const ini = require('ini');
 
-var reversemd5 = ReverseMd5({
-	lettersUpper: true,
-	lettersLower: true,
-	numbers: true,
-	special: true,
-	whitespace: true,
-	maxLen: 30
-})
+// var reversemd5 = ReverseMd5({
+// 	lettersUpper: true,
+// 	lettersLower: true,
+// 	numbers: true,
+// 	special: true,
+// 	whitespace: true,
+// 	maxLen: 30
+// });
 
+var fs = require('fs'),
+	path = require('path');
+
+
+async function OnlineServer() {
+	let qqq = await ping.promise.probe("prow.li");
+	if (qqq.avg == "unknown") {
+		let al = new JSAlert("Es konnte keine Verbindung zum Server hergestellt werden!\n\nBitte versuche es nochmal oder verwende den OFFLINE-MODUS", "Fehler!");
+		al.addButton("Erneut versuchen").then(function() {
+			location.reload();
+		});
+		al.addButton("OFFLINE").then(function() {
+			OfflineModus();
+		});
+		al.show();
+	}
+}
+
+
+function ftpowo() {
+	ftp.connect({host: "localhost", user: "UnoUser", password: ""})
+	  .then(function (serverMessage) {
+	    console.log('Server message: '+serverMessage);
+	    return ftp.list('/');
+	  }).then(function (list) {
+	    console.log('Directory listing:');
+	    console.dir(list);
+	    return ftp.end();
+	  });
+}
+
+function ftplogin()
+{
+	return ftp.connect({host: "localhost", user: "UnoUser", password: ""});
+	ftpping();
+}
+
+function ftpowo() {
+	ftp.connect({host: "localhost", user: "UnoUser", password: ""})
+	  .then(function (serverMessage) {
+	    //console.log('Server message: '+serverMessage);
+	    return ftp.list('/');
+	  }).then(function (list) {
+	    console.log('Directory listing:');
+	    console.dir(list);
+	    return ftp.end();
+	  });
+}
+
+function UnoFTP(Befehl, Parameter) {
+	switch (Befehl) {
+		case "connect": return ftp.connect({host: "localhost", user: "UnoUser", password: ""}); break;
+		case "list": return ftp.list(Parameter); break;
+		case "delete": return ftp.delete(Parameter); break;
+		// case "download": UnoFTPdownload(Parameter); break;
+		case "disconnect": return ftp.end(); break;
+		case "upload": return UnoFTPupload(Parameter); break;
+		case "": return 0; break;
+		case "": return 0; break;
+	}
+}
+
+function move() {
+  var elem = document.getElementById("myBar");
+  var width = 1;
+  var id = setInterval(frame, 10);
+  function frame() {
+    if (width >= 100) {
+      clearInterval(id);
+    } else {
+      width++;
+      elem.style.width = width + '%';
+    }
+  }
+}
+function PrepareFirstUse() {
+	con.connect(function(err) {
+	  if (err) throw err;
+	  console.log("MySQL: Connected to localhost!");
+	  con.query("CREATE DATABASE IF NOT EXISTS abschlussprojekt;", function (err, result) {
+	    if (err) throw err;
+	    console.log(result);
+	  });
+	});
+	document.getElementById("FirstLoadLog").innerHTML += "<br> Datenbank erstellt..."
+}
+
+
+// function UnoFTPdownload(user)
+// {
+// 	return ftp.get("/FTP/"+user+"/Uno.dat").then(function(stream)
+// {
+// 	return new Promise(function (resolve, reject)) {
+// 		stream.once("close", resolve);
+// 		stream.once("error", reject);
+// 		//stream.pipe(fs.createWriteStream(""))
+// 	});
+// 	}
+// }
+
+
+
+function ftpping() {
+	var minutes = 1, the_interval = minutes * 60 * 1000;
+	setInterval(function() {
+	console.log("Ping...");
+	return ftp.list("/");
+}, the_interval);
+}
+
+
+var cmd=require('node-cmd');
+function phptest()
+{
+
+
+execPhp('index.php', function(error, php, outprint){
+    // outprint is now `One'.
+
+    php.my_function(1, 2, function(err, result, output, printed){
+        // result is now `3'
+        // output is now `One'.
+        // printed is now `Two'.
+    });
+});
+}
+
+const runner = require('child_process');
+
+function php2(Befehl)
+{
+	cmd.get(
+        'cd php && php.exe ../phpskripte/index.php '+Befehl,
+        function(err, data, stderr){
+            console.log(data)
+        }
+    );
+}
 
 const IPAdresse = testObjectIP()[1];
 const Kernel = os.type;
@@ -26,7 +175,7 @@ const CPUKerne = os.cpus().length
 
 const EventEmitter = require('events');
 
-class MyEmitter extends EventEmitter {}
+class MyEmitter extends EventEmitter {};
 
 const myEmitter = new MyEmitter();
 // increase the limit
@@ -60,40 +209,73 @@ Object.keys(ifaces).forEach(function (ifname) {
   });
 });
 return result;
-delete result;
 }
-function Load3() {
-  console.warn("Load3");
-  if (DarkMode) {
-    if (lightOrDark(DunklerModusFarbe) == "dark") {
-      console.log("Dunkles Theme. Schrift wird heller...");
-      document.getElementById("html").setAttribute("style", "background-color: "+DunklerModusFarbe+"; color: white;");
-      document.body.setAttribute("style", "background-color: "+DunklerModusFarbe+"; color: white;");
-      row2 = document.getElementById("table").getElementsByTagName("td");
+var ui = "";
+let fuseIPtest = false;
+function IPtest() {
+	if (fuseIPtest) {
+		console.error("Wurde schon ausgeführt");
+		return;
+	}
+	fuseIPtest = true;
+	var result = [];
+Object.keys(ifaces).forEach(function (ifname) {
+  var alias = 0;
 
 
-       for (let i = 0; i <= document.getElementsByTagName("td").length; i++) {
-         console.log(document.getElementsByTagName("td"));
-         document.getElementsByTagName("td")[i].style.borderColor = "white";
-         console.log("Weiß");
-      }
+	ifaces[ifname].forEach(function (iface) {
+    if ('IPv4' !== iface.family || iface.internal !== false) {
+      // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+      return;
     }
 
-    else {
-      document.getElementById("html").setAttribute("style", "background-color: "+DunklerModusFarbe+";");
-      document.body.setAttribute("style", "background-color: "+DunklerModusFarbe+";");
-      if (row2 === undefined) {
-        console.warn("ROW2 existiert nicht!");
-      }
-      else {
-        for (var i = 0; i < document.getElementsByTagName("td").length; i++) {
-          document.getElementsByTagName("td")[i].style.borderColor = "black";
-          //console.log("Schwarz");
-        }
-      }
+    if (alias >= 1) {
+      // this single interface has multiple ipv4 addresses
+      console.log(ifname + ':' + alias, iface.address);
+			ui+=ifname + " "+iface.address + "\n";
+			console.warn(ui);
+     } else {
+      console.log(ifname, iface.address);
+			ui+=ifname + " "+iface.address + "\n";
+			console.warn(ui);
     }
-  }
+    ++alias;
+  });
+	document.getElementById("TableIP").title = ui;
+});
 }
+// function Load3() {
+//   console.warn("Load3");
+//   if (DarkMode) {
+//     if (lightOrDark(DunklerModusFarbe) == "dark") {
+//       console.log("Dunkles Theme. Schrift wird heller...");
+//       document.getElementById("html").setAttribute("style", "background-color: "+DunklerModusFarbe+"; color: white;");
+//       document.body.setAttribute("style", "background-color: "+DunklerModusFarbe+"; color: white;");
+//       row2 = document.getElementById("table").getElementsByTagName("td");
+//
+//
+//        for (let i = 0; i <= document.getElementsByTagName("td").length; i++) {
+//          console.log(document.getElementsByTagName("td"));
+//          document.getElementsByTagName("td")[i].style.borderColor = "white";
+//          console.log("Weiß");
+//       }
+//     }
+//
+//     else {
+//       document.getElementById("html").setAttribute("style", "background-color: "+DunklerModusFarbe+";");
+//       document.body.setAttribute("style", "background-color: "+DunklerModusFarbe+";");
+//       if (row2 === undefined) {
+//         console.warn("ROW2 existiert nicht!");
+//       }
+//       else {
+//         for (var i = 0; i < document.getElementsByTagName("td").length; i++) {
+//           document.getElementsByTagName("td")[i].style.borderColor = "black";
+//           //console.log("Schwarz");
+//         }
+//       }
+//     }
+//   }
+// }
 
 const SD = document.getElementById("SD");
 
@@ -168,18 +350,18 @@ function Entschlüsseln(buffer){
 
 function AlleFreigeben()
 {
-  dat("UPDATE INUSE SET Server1 = FALSE;");
-  dat("UPDATE INUSE SET Server2 = FALSE;");
-  dat("UPDATE INUSE SET Server3 = FALSE;");
-  dat("UPDATE INUSE SET Server4 = FALSE;");
-  dat("UPDATE INUSE SET Server5 = FALSE;");
+  dat("UPDATE INUSE SET server1 = FALSE;"); dat("UPDATE server1 SET FULL = FALSE, EMPTY = TRUE;");
+  dat("UPDATE INUSE SET server2 = FALSE;"); dat("UPDATE server2 SET FULL = FALSE, EMPTY = TRUE;");
+  dat("UPDATE INUSE SET server3 = FALSE;"); dat("UPDATE server3 SET FULL = FALSE, EMPTY = TRUE;");
+  dat("UPDATE INUSE SET server4 = FALSE;"); dat("UPDATE server4 SET FULL = FALSE, EMPTY = TRUE;");
+  dat("UPDATE INUSE SET server5 = FALSE;"); dat("UPDATE server5 SET FULL = FALSE, EMPTY = TRUE;");
   console.warn("Alle Server wurden wieder freigegeben!");
 }
 
-//dat("UPDATE Server1 SET Spieler1Karten = '"+Spieler1Karten.toString()+"', Spieler1KartenFarbe = '"+Spieler1KartenFarbe.toString()+"', Spieler2Karten = '"+Spieler2Karten.toString()+"', Spieler2KartenFarbe = '"+Spieler2KartenFarbe.toString()+"';");
+//await dat("UPDATE Server1 SET Spieler1Karten = '"+Spieler1Karten.toString()+"', Spieler1KartenFarbe = '"+Spieler1KartenFarbe.toString()+"', Spieler2Karten = '"+Spieler2Karten.toString()+"', Spieler2KartenFarbe = '"+Spieler2KartenFarbe.toString()+"';");
 
-// dat("INSERT INTO Server1 (Spieler1Karten, Spieler1KartenFarbe, Spieler2Karten, Spieler2KartenFarbe) VALUES ('"+Spieler1Karten+"', '"+Spieler1KartenFarbe+"', '"+Spieler2KartenFarbe+"');");
-// dat("INSERT INTO Server1 (Spieler1Karten, Spieler1KartenFarbe) VALUES ('10,5,7,3', 'BLAU,GELB,GRÜN,ROT')");
+// await dat("INSERT INTO Server1 (Spieler1Karten, Spieler1KartenFarbe, Spieler2Karten, Spieler2KartenFarbe) VALUES ('"+Spieler1Karten+"', '"+Spieler1KartenFarbe+"', '"+Spieler2KartenFarbe+"');");
+// await dat("INSERT INTO Server1 (Spieler1Karten, Spieler1KartenFarbe) VALUES ('10,5,7,3', 'BLAU,GELB,GRÜN,ROT')");
 
 //CREATE TABLE IF NOT EXISTS Server1 (Spieler1Karten VARCHAR(255), Spieler1KartenFarbe VARCHAR(255), Spieler2Karten VARCHAR(255), Spieler2KartenFarbe VARCHAR(255));
 
@@ -191,11 +373,8 @@ async function Save(Farbe) {
   //if (!settingsSQL) {
     fs.writeFileSync('./js/dark.txt', DarkMode, (err) => {
     if (err) throw err;
-
-
     console.log('Modus saved!');
     });
-
     fs.writeFileSync('./js/rainbow.txt', isRainbow, (err) => {
     if (err) throw err;
 
@@ -213,34 +392,168 @@ async function Save(Farbe) {
 
   // else {
   //   await dat("TRUNCATE TABLE settings");
-  //   dat("INSERT INTO settings (DarkMode,Farbe) VALUES ('"+DarkMode+"','"+document.getElementById("foo").value+"');");
-  //   dat("COMMIT;")
+  //   await dat("INSERT INTO settings (DarkMode,Farbe) VALUES ('"+DarkMode+"','"+document.getElementById("foo").value+"');");
+  //   await dat("COMMIT;")
   // }
  }
+
+
+let Settings = {
+	"DarkMode":"false",
+	"DarkModeFarbe":"#000000",
+	"SP1Name": "Spieler1",
+	"SP2Name": "Spieler2",
+	"isRainbow": "false"
+};
+
+ async function Savealt(Farbe) {
+   Settings.DarkModeFarbe = document.getElementById("foo").value;
+	 Settings.SP1Name = Benutzername;
+	 Settings.isRainbow = isRainbow;
+	 Settings.DarkMode = DarkMode;
+	 console.warn("SPEICHERN");
+     fs.writeFileSync('./js/settings.JSON', JSON.stringify(Settings), (err) => {
+     if (err) throw err;
+     console.log('Modus saved!');
+	 });
+  }
+
+async function Loadalt()
+{
+	  if (location.href.includes("index.html"))
+		{
+	     generateTable();
+	     console.log("Tabelle generieren...");
+	  }
+
+	      filePath = path.join(__dirname, './js/settings.JSON');
+	      console.log("Einstellungen lesen...");
+
+	      fs.readFileSync(filePath, {encoding: 'utf-8'}, async function(err,fileSettings)
+				{
+					fileSettings = JSON.parse(fileSettings);
+	          if (!err)
+						{
+	            //await entschlüsseln(); FUNKTIONIERT NICHT
+	              console.log('Einstellungen: ' + fileSettings);
+	              if (fileSettings.DarkModeFarbe.indexOf("#") > -1)
+								{
+	                Settings.DarkModeFarbe = Farbe;}
+	              else
+								{
+	                Settings.DarkModeFarbe = "#"+Farbe;
+	              }
+	              console.log('Dunkler Modus: ' + fileSettings.DarkMode);
+	              if (fileSettings.DarkMode == "true")
+								{
+	                Settings.DarkMode = true;
+	              }
+	              else if (fileSettings.DarkMode == "false")
+								{
+	                Settings.DarkMode = false;
+	              }
+	              else
+								{
+	                Settings.DarkMode = undefined;
+	              }
+	              Settings.DarkMode = fileSettings.DarkMode;
+
+								console.log("RAINBOW? "+Settings.isRainbow);
+								Settings.isRainbow = fileSettings.isRainbow;
+								updaterainbow(Settings.isRainbow);
+								if (Settings.DarkMode)
+								{
+									if (lightOrDark(Settings.DarkModeFarbe) == "dark")
+									{
+										console.log("Dunkles Theme. Schrift wird heller...");
+										document.getElementById("html").setAttribute("style", "background-color: "+Settings.DarkModeFarbe+"; color: white;");
+										document.body.setAttribute("style", "background-color: "+Settings.DarkModeFarbe+"; color: white;");
+										row2 = document.getElementById("table").getElementsByTagName("td");
+										for (let i = 0; i <= document.getElementsByTagName("td").length; i++)
+										{
+					 	         //console.log(document.getElementsByTagName("td"));
+					 	         document.getElementsByTagName("td")[i].style.borderColor = "white";
+					 	         console.log("Weiß");
+					 	      	}
+									}
+									else
+									{
+										document.getElementById("html").setAttribute("style", "background-color: "+DunklerModusFarbe+";");
+							      document.body.setAttribute("style", "background-color: "+DunklerModusFarbe+";");
+										if (row2 == undefined) {
+											console.warn("ROW2 EXISTIERT NICHT!");
+										}
+										else
+										{
+											for (var i = 0; i < document.getElementById("td").length; i++)
+											{
+												document.getElementById("td")[i].style.borderColor = "black";
+											}
+										}
+									}
+									Load2alt();
+								}
+								else
+								{
+									document.getElementById("html").removeAttribute("style");
+							    document.body.removeAttribute("style");
+								}
+							}
+	      });
+	}
+
+async function Load2alt()
+{
+	if (lightOrDark(DunklerModusFarbe) == "dark")
+	{
+		row2 = document.getElementById("table").getElementsByTagName("td");
+		for (var i = 0; i < document.getElementsByTagName("td").length; i++)
+		{
+			document.getElementsByTagName("td")[i].style.borderColor = "white";
+			console.log(document.getElementsByTagName("td").length);
+		}
+	}
+	else
+	{
+		if (row2 == undefined)
+		{
+			console.warn("ROW2 EXISTIERT NICHT");
+		}
+		else
+		{
+			for (var i = 0; i < document.getElementsByTagName("td").length; i++)
+			{
+        document.getElementsByTagName("td")[i].style.borderColor = "black";
+        console.log("Schwarz");
+      }
+		}
+	}
+}
 
 var DarkMode = false;
 var DunklerModusFarbe;
 
 async function Load2()
 {
-  await Sleep(100);
-  if (lightOrDark(DunklerModusFarbe) == "dark") {
-    row2 = document.getElementById("table").getElementsByTagName("td");
-    for (var i = 0; i < document.getElementsByTagName("td").length; i++) {
-      document.getElementsByTagName("td")[i].style.borderColor = "white";
-      console.log(document.getElementsByTagName("td").length);
-    }
-  }
-  else {
-    if (row2 == undefined) {
-      console.warn("ROW2 EXISTIERT NICHT");
-    }
-    else {
-      for (var i = 0; i < document.getElementsByTagName("td").length; i++) {
-        document.getElementsByTagName("td")[i].style.borderColor = "black";
-        console.log("Schwarz");
-      }
-    }
+  if (document.location.href.includes("index")) {
+		if (lightOrDark(DunklerModusFarbe) == "dark") {
+	    row2 = document.getElementById("table").getElementsByTagName("td");
+	    for (var i = 0; i < document.getElementsByTagName("td").length; i++) {
+	      document.getElementsByTagName("td")[i].style.borderColor = "white";
+	      console.log(document.getElementsByTagName("td").length);
+	    }
+	  }
+	  else {
+	    if (row2 == undefined) {
+	      console.warn("ROW2 EXISTIERT NICHT");
+	    }
+	    else {
+	      for (var i = 0; i < document.getElementsByTagName("td").length; i++) {
+	        document.getElementsByTagName("td")[i].style.borderColor = "black";
+	        console.log("Schwarz");
+	      }
+	    }
+	  }
   }
 
 }
@@ -256,8 +569,7 @@ async function Load()
      console.log("Tabelle generieren...");
   }
   //if (!settingsSQL) {
-    var fs = require('fs'),
-      path = require('path'),
+
       filePath = path.join(__dirname, './js/darkFarbe.txt');
       console.log("Farbe lesen...");
 
@@ -322,94 +634,35 @@ async function Load()
       );
       await Sleep(10);
       updaterainbow(isRainbow);
-  //}
-  // else {
-  //   var ohno = await loadSettings(); //new Variable
-  //   //await Sleep(100);
-  //   console.log("ohno=");
-  //   console.log(ohno);
-  //   // while(typeof ohno[0].Name != undefined) {
-  //   //   console.warn("LoadSettings(); hat falsche Datenbank aufgerufen! Versuche erneut in 100ms");
-  //   //   await Sleep(100);
-  //   //   delete ohno;
-  //   //   var ohno = await loadSettings();
-  //   // }
-  //
-  //
-  //   while (ohno == undefined) { //Did the varibale load right?
-  //     delete ohno;
-  //     var ohno = await loadSettings();
-  //     if (ohno != undefined) {
-  //       console.warn("Ohno has the right type"); //Isn't undefined anymore, can continue and break out of loop
-  //       console.log(ohno);
-  //       haha = ohno; //Had to use a new one because ohno always undeclares itself
-  //       break;
-  //     }
-  //     console.warn("ohno = undefined");
-  //     console.log(ohno);
-  //     await Sleep(1000);
-  //   }
-  //   await Sleep(100);
-  //   while (haha == []) { //Is the variable empty?
-  //     console.warn("haha is empty");
-  //     delete haha;
-  //     var haha = await loadSettings();
-  //     await Sleep(1000);
-  //   }
-  //   console.log(haha);
-  //   await Sleep(100);
-  //   if (haha[0].DarkMode == "true") {
-  //     DarkMode = true;
-  //   }
-  //   else if (haha[0].DarkMode == "false") {
-  //     DarkMode = false;
-  //   }
-  //   else {
-  //     DarkMode = false;
-  //     Fehler(2);
-  //   }
-  //
-  //
-  //   console.log('DarkModeColour: ' + haha[0].Farbe);
-  //   if (DunklerModusFarbe.indexOf("#") > -1) { // Ist # schon enthalten?
-  //     DunklerModusFarbe = haha[0].Farbe;
-  //   }
-  //   else {
-  //     DunklerModusFarbe = "#"+haha[0].Farbe;
-  //   }
-  //
-  //
-  // }
     await Sleep(9);
     if (DarkMode) {
-    // document.getElementById("html").setAttribute("style", "background-color: #131313;");
-    // document.body.setAttribute("style", "background-color: #131313;");
     if (lightOrDark(DunklerModusFarbe) == "dark") {
       console.log("Dunkles Theme. Schrift wird heller...");
       document.getElementById("html").setAttribute("style", "background-color: "+DunklerModusFarbe+"; color: white;");
       document.body.setAttribute("style", "background-color: "+DunklerModusFarbe+"; color: white;");
-      row2 = document.getElementById("table").getElementsByTagName("td");
+			if (document.location.href.includes("index")) {
+				row2 = document.getElementById("table").getElementsByTagName("td");
 
 
-       for (let i = 0; i <= document.getElementsByTagName("td").length; i++) {
-         //console.log(document.getElementsByTagName("td"));
-         document.getElementsByTagName("td")[i].style.borderColor = "white";
-         console.log("Weiß");
-      }
+	       for (let i = 0; i <= document.getElementsByTagName("td").length; i++) {
+	         //console.log(document.getElementsByTagName("td"));
+	         document.getElementsByTagName("td")[i].style.borderColor = "white";
+	         console.log("Weiß");
+	      }
+			}
     }
 
-    else {
+    else
+		{
       document.getElementById("html").setAttribute("style", "background-color: "+DunklerModusFarbe+";");
       document.body.setAttribute("style", "background-color: "+DunklerModusFarbe+";");
-      if (row2 === undefined) {
-        console.warn("ROW2 existiert nicht!");
-      }
-      else {
-        for (var i = 0; i < document.getElementsByTagName("td").length; i++) {
-          document.getElementsByTagName("td")[i].style.borderColor = "black";
-          //console.log("Schwarz");
+        if (document.location.href.includes("index")) {
+					for (var i = 0; i < document.getElementsByTagName("td").length; i++)
+					{
+	          document.getElementsByTagName("td")[i].style.borderColor = "black";
+	          //console.log("Schwarz");
+	      	}
         }
-      }
     }
     Load2();
 
@@ -476,6 +729,15 @@ function clear(lol)
 }
 
 
+async function SaveState()
+{
+
+}
+
+async function LoadState()
+{
+
+}
 
 async function cryptotest(Message)
 {
@@ -774,7 +1036,7 @@ async function Senden(inputname,Spiel,score,welcherSpieler)
   else {
     score = Spieler1Karten.length;
   }
-  dat("INSERT INTO HIGHSCORE (Name,Spiel,Highscore) VALUES ('"+inputname+"','"+Spiel+"',"+score+");");
-  alert("Vielen Dank, deine Daten wurden gesendet :3");
+  await dat("INSERT INTO HIGHSCORE (Name,Spiel,Highscore) VALUES ('"+inputname+"','"+Spiel+"',"+score+");");
+  JSAlert.alert("Vielen Dank, deine Daten wurden gesendet :3");
   location.reload();
 }

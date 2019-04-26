@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html id="html" lang="en" dir="ltr">
   <head>
-
+    <script>
+    window.$ = window.jQuery = require('jquery');
+    $("#Formular").hide();
+  </script>
     <link rel="stylesheet" href="./css/master.css">
     <link rel="stylesheet" href="./css/Uno.css">
     <script src="./node_modules/popper.js/dist/popper.js"></script>
-    <script src="./node_modules/jQuery/lib/node-jquery.js"></script>
+    <!-- <script src="./node_modules/jQuery/lib/node-jquery.js"></script> -->
     <script src="./js/mysql.js" charset="utf-8"></script>
 
     <!-- <script src="./js/jQuery/popper.js"></script> -->
@@ -74,20 +77,21 @@
 
     </script>
     <script src="./js/main.js"></script>
-    <!-- <script src="./js/Hauptmenü.js"></script> -->
     <script src="./js/Uno.js"></script>
     <script type="text/javascript">
-    $(document).ready( async function()
+    window.onload = async function()
   {
-
-    $("#Formular").hide();
-
-    //await Load();
+    //connect();
+    console.warn("1");
+    await Load();
+    console.warn("2");
     await Sleep(10);
-    Load();
+    $("#Formular").hide();
+    console.warn("3");
     await Sleep(200);
+    console.warn("4");
     Abfrage();
-  });
+  }
 
     </script>
   </body>

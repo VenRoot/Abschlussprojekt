@@ -3,14 +3,10 @@
   <head>
     <link rel="stylesheet" href="./css/table.css">
     <link rel="stylesheet" href="./css/master.css">
-    <script src="./node_modules/popper.js/dist/popper.js"></script>
-    <script src="./node_modules/jQuery/lib/node-jquery.js"></script>
     <script src="./js/jscolor.js" charset="utf-8"></script>
-
-    <script src="./js/jQuery/popper.js"></script>
-    <script src="./js/jQuery/jQuery.js"></script>
-    <script src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
-
+    <script>
+    window.$ = window.jQuery = require('jquery');
+  </script>
     <meta charset="utf-8">
     <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="./css/fullpage.min.css">
@@ -18,10 +14,28 @@
     <script src="./js/main.js"></script>
     <title>Abschlussprojekt</title>
   </head>
-  <body>
+  <body onload="onloadindex();">
+    <!-- <div id="Loading">
+      <h1>Projekt wird betriebsbereit gemacht...</h1>
+      <h2>Ven</h2>
+      <img src="./img/loading.gif" alt="location.reload();">
+    </div> -->
+    <div id="PingTable">
+      <table>
+        <td id="Ping">Ping: 0ms </td>
+      </table>
+    </div>
     <div id="HMScreen">
+      <div id="LoadingScreen">
+        Hey, herzlich Willkommen bei meinem Projekt. Bitte warte, während MySQL sich einrichtet :3
+        <div class="loader"></div>
+        <div id="FirstLoadLog">
+          Richte MySQL Tabellen ein...
+        </div>
+      </div>
       <div id="fullpage">
         <div class="section">
+
           <h1>Markus Löffler</h1>
           <br>
           <h2>GameOS</h2>
@@ -34,46 +48,49 @@
           <button type="button" id="rainbowbutton" onclick="toggleRainbow();" name="button">RAINBOW</button>
 
           <div class="span" id="anmeldediv">
-            <button type="button" onclick="prelogin();" class="btn btn-danger"name="button">Anmelden</button>
-            <button type="button" oncanplay="register();"class="btn btn-success" name="button">Registrieren</button>
+            <button type="button" id="loginbtn" onclick="prelogin();" class="btn btn-danger"name="button">Anmelden</button>
+            <button type="button" id="registerbtn" onclick="register();" class="btn btn-success" name="button">Registrieren</button>
             <br>
             <input class="input1" id="usernameinput" type="text" placeholder="Benutzername" name="username"> <br>
             <input class="input1" id="passwordinput" type="password" placeholder="Passwort" name="password">
+            <br><br><button type="button" class="btn btn-info" onclick="testbereich();" name="button">Testbereich</button>
           </div>
-
           <table class="tg">
+            <h3>Uno Lobby beitreten</h3>
+            <input type="text" class="Spieler1NameFeldHM" placeholder="Dein Name"> <br>
             <tr>
               <td>Server 1</td>
-              <td id="TableServer1" title="Keine Spieler" class="masterTooltip">0/2 Spieler</td>
+              <td id="TableServer1" class="masterTooltip" title="Keine Spieler" class="masterTooltip">0/2 Spieler</td>
             </tr>
             <tr>
               <td>Server 2</td>
-              <td id="TableServer2" title="Keine Spieler">0/2 Spieler</td>
+              <td id="TableServer2" class="masterTooltip" title="Keine Spieler">0/2 Spieler</td>
             </tr>
             <tr>
               <td>Server 3</td>
-              <td id="TableServer3" title="Keine Spieler">0/2 Spieler</td>
+              <td id="TableServer3" class="masterTooltip" title="Keine Spieler">0/2 Spieler</td>
             </tr>
             <tr>
               <td>Server 4</td>
-              <td id="TableServer4" title="Keine Spieler">0/2 Spieler</td>
+              <td id="TableServer4" class="masterTooltip" title="Keine Spieler">0/2 Spieler</td>
             </tr>
             <tr>
               <td>Server 5</td>
-              <td id="TableServer4" title="Keine Spieler">0/2 Spieler</td>
+              <td id="TableServer5" class="masterTooltip" title="Keine Spieler">0/2 Spieler</td>
             </tr>
           </table>
 
         </div>
         <div class="section">
-          <h1>Uno</h1>
+          <h1>Uno hosten</h1>
           <br>
           <h2>Spiele gegen deinen Kumpel um die Wette! <br> Wer wird zuerst alle Karten ablegen können?</h2>
+          <h3>Achtung. Bitte nur, wenn du ein Spiel hosten/erstellen möchtest oder gemeinsam an einem PC spielen möchest</h3>
           <br>
           <h3>Spielzeit: 5-10 Minuten</h3>
-          <input type="text" id="Spieler1NameFeldHM" placeholder="Name von Spieler 1"> <br>
+          <input type="text" id="Spieler1NameFeldHM" class="Spieler1NameFeldHM" placeholder="Name von Spieler 1"> <br>
           <input type="text" id="Spieler2NameFeldHM" placeholder="Name von Spieler 2"> <br>
-          <button type="button" class="btn btn-success" id="UnoButton" onclick="UnoStartHM();" name="button">Jetzt spielen!</button>
+          <button type="button" class="btn btn-success" id="UnoButton" onclick="UnoStartHM();" name="button">Jetzt Spiel erstellen!</button>
           <table id="UnoTable" class="tg">
 
           </table>
@@ -87,23 +104,23 @@
           <table class="tg">
   <tr>
     <td>Benutzername</td>
-    <td id="TableUsername">Benutzername konnte nicht angezeigt werden</td>
+    <td id="TableUsername" title="Benutzername">Benutzername konnte nicht angezeigt werden</td>
   </tr>
   <tr>
     <td>Kernel</td>
-    <td id="TableSystem">Kernel wurde nicht erkannt</td>
+    <td id="TableSystem" title="Kernel">Kernel wurde nicht erkannt</td>
   </tr>
   <tr>
     <td>IP-Adresse</td>
-    <td id="TableIP">0.0.0.0</td>
+    <td id="TableIP" title="IP-Adresse">0.0.0.0</td>
   </tr>
   <tr>
     <td>Architektur</td>
-    <td id="TableArch">Architektur nicht erkannt</td>
+    <td id="TableArch" title="System-Architektur">Architektur nicht erkannt</td>
   </tr>
   <tr>
     <td>CPU</td>
-    <td id="TableCPU">CPU nicht erkannt</td>
+    <td id="TableCPU" title="Prozessor">CPU nicht erkannt</td>
   </tr>
 </table>
         </div>
@@ -118,27 +135,44 @@
     <script src="./js/mysql.js" charset="utf-8"></script>
 
     <script type="text/javascript">
-    $(document).ready( async function()
-  {
-    document.getElementById("usernamefeld").innerHTML+= Benutzername;
-    document.getElementById("Spieler1NameFeldHM").value = Benutzername;
-    await Sleep(100);
-    //await generateTable();
-    await CPUTable();
-    console.warn("CPUTable");
-     $("#foo").hide();
-     $("#Übernehmen").hide();
-    await Sleep(50);
-    await Load();
-    console.warn("Load");
-    await Sleep(10);
-    await Load3();
-    ServerTable();
-    console.warn("ServerTable");
-    console.warn("generateTable");
-    await dat("SELECT * FROM users WHERE username = 'h';")
-   });
-    </script>
+    window.onload = async function() {
+      await OnlineServer();
+      Ping();
+      $("#LoadingScreen").hide();
+      console.log("Check, if firstuse");
+      let firstuse = await dat("SELECT * FROM firstuse;");
+      if (firstuse[0].isFirstUse) {
+        $("#fullpage").hide();
+        PrepareFirstUse();
+      }
+      else {
+        $("#LoadingScreen").hide();
+      }
+      document.getElementById("usernamefeld").innerHTML+= Benutzername;
+      document.getElementById("Spieler1NameFeldHM").value = Benutzername;
+      //connect();
 
+      //await Sleep(100);
+      console.warn("1");
+      await generateTable();
+      await CPUTable();
+      console.warn("CPUTable");
+       $("#foo").hide();
+       $("#Übernehmen").hide();
+       LoadServer();
+      await Sleep(50);
+      if (useJSON) {
+        Loadalt();
+      }
+      else {
+        Load();
+      }
+      console.warn("Load");
+      ServerTable();
+      console.warn("ServerTable");
+      console.warn("generateTable");
+
+    }
+    </script>
   </body>
 </html>
