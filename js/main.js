@@ -348,13 +348,16 @@ function Entschlüsseln(buffer){
 }
 
 
-function AlleFreigeben()
+async function AlleFreigeben()
 {
-  dat("UPDATE INUSE SET server1 = FALSE;"); dat("UPDATE server1 SET FULL = FALSE, EMPTY = TRUE;");
-  dat("UPDATE INUSE SET server2 = FALSE;"); dat("UPDATE server2 SET FULL = FALSE, EMPTY = TRUE;");
-  dat("UPDATE INUSE SET server3 = FALSE;"); dat("UPDATE server3 SET FULL = FALSE, EMPTY = TRUE;");
-  dat("UPDATE INUSE SET server4 = FALSE;"); dat("UPDATE server4 SET FULL = FALSE, EMPTY = TRUE;");
-  dat("UPDATE INUSE SET server5 = FALSE;"); dat("UPDATE server5 SET FULL = FALSE, EMPTY = TRUE;");
+  // await dat("UPDATE INUSE SET server1 = FALSE;"); await dat("UPDATE server1 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE;");
+  // await dat("UPDATE INUSE SET server2 = FALSE;"); await dat("UPDATE server2 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE;");
+  // await dat("UPDATE INUSE SET server3 = FALSE;"); await dat("UPDATE server3 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE;");
+  // await dat("UPDATE INUSE SET server4 = FALSE;"); await dat("UPDATE server4 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE;");
+  // await dat("UPDATE INUSE SET server5 = FALSE;"); await dat("UPDATE server5 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE;");
+	for (var i = 0; i <= 5; i++) {
+		await Freigeben(i);
+	}
   console.warn("Alle Server wurden wieder freigegeben!");
 }
 
@@ -418,8 +421,28 @@ let Settings = {
 	 });
   }
 
+function checkForFile(fileName)
+{
+	fs.exists(fileName, function (exists)
+	{
+		if(exists)
+	    {
+
+	    }
+			else
+	   	{
+	       fs.writeFile(fileName, "", function (err, data)
+	      {
+
+	      })
+	    }
+	 });
+}
+
+
 async function Loadalt()
 {
+	await checkForFile("./js/settings.JSON")
 	  if (location.href.includes("index.html"))
 		{
 	     generateTable();
@@ -564,6 +587,19 @@ var haha;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////!bookmark!
 async function Load()
 {
+	fs.existsSync("./js/settings.JSON", {flag: "wx"}, function(err, data)
+	{
+		if(exists)
+		{
+			callback();
+		}
+		else {
+			fs.writeFileSync("./js/settings.JSON", {flag: "wx"}, function(err, data)
+		{
+			callback();
+		});
+		}
+	});
   if (location.href.includes("index.html")) {
      await generateTable();
      console.log("Tabelle generieren...");
@@ -1019,6 +1055,68 @@ async function generateTable()
   //table.rows[0].cells[1].setAttribute("onclick", "SortierenHighscore();");
   //table.rows[0].cells[2].setAttribute("onclick", "SortierenSpieler();");
   //table.rows[0].cells[3].setAttribute("onclick", "SortierenSpiel();");
+}
+
+function Watch(Object, prototype) {
+	if (!Object.prototype.watch) {
+		Object.defineProperty(Object.prototype, "watch", {
+			  enumerable: false
+			, configurable: true
+			, writable: false
+			, value: function (prop, handler) {
+				var
+				  oldval = this[prop]
+				, newval = oldval
+				, getter = function () {
+					return newval;
+				}
+				, setter = function (val) {
+					oldval = newval;
+					return newval = handler.call(this, prop, oldval, val);
+				}
+				;
+
+				if (delete this[prop]) { // can't watch constants
+					Object.defineProperty(this, prop, {
+						  get: getter
+						, set: setter
+						, enumerable: true
+						, configurable: true
+					});
+				}
+			}
+		});
+	}
+}
+
+function Unwatch(Object, prototype) {
+	// object.unwatch
+	if (!Object.prototype.unwatch) {
+		Object.defineProperty(Object.prototype, "unwatch", {
+			  enumerable: false
+			, configurable: true
+			, writable: false
+			, value: function (prop) {
+				var val = this[prop];
+				delete this[prop]; // remove accessors
+				this[prop] = val;
+			}
+		});
+	}
+}
+
+async function Freigeben(svr)
+{
+  switch (svr) {
+		case 1: await dat("UPDATE INUSE SET server1 = FALSE;"); await dat("UPDATE server1 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
+		case 2: await dat("UPDATE INUSE SET server2 = FALSE;"); await dat("UPDATE server2 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
+		case 3: await dat("UPDATE INUSE SET server3 = FALSE;"); await dat("UPDATE server3 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
+		case 4: await dat("UPDATE INUSE SET server4 = FALSE;"); await dat("UPDATE server4 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
+		case 5: await dat("UPDATE INUSE SET server5 = FALSE;"); await dat("UPDATE server5 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
+    default: Fehler(4); //Server konnte nicht freigegeben werden!
+
+  }
+  console.warn("Server "+svr+" wurde wieder freigegeben!");
 }
 
 function Eingabe(Name, SpielArt, HighscoreLUL)

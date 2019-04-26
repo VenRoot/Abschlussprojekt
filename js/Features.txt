@@ -53,6 +53,6 @@ BUG: MySQL Query nicht perfekt. Siehe UnoStart Multiplayer BUG BEHOBEN!!!!! 25.4
 BUG: Uno.JS:57
 
 
-#Insgesamt existieren 3852 Zeilen Code in meinem Projekt, welche von mir von Hand geschrieben wurden. Dazu zählen sowohl aktive, als auch inaktive Features, welche ich wieder herausgenommen, aber nicht gelöscht habe. Gelöschte können nicht gezählt werden!
+#Insgesamt existieren über 5200 Zeilen Code in meinem Projekt, welche von mir von Hand geschrieben wurden. Dazu zählen sowohl aktive, als auch inaktive Features, welche ich wieder herausgenommen, aber nicht gelöscht habe. Gelöschte können nicht gezählt werden!
 
 In GTA V gibt es 100 Millionen Zeilen Code. Es war 7 Jahre lang in Entwicklung. 139 Programmierer. Ein vollkommen ausgebildeter Programmierer hätte in 5 Monaten 42822 Zeilen Code geschrieben, ohne Bestätigung, dass alles per Hand geschrieben wurde.

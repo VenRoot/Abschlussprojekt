@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Testbereich</title>
+
+  </head>
+  <body>
+    <h1>Dies ist ein Testbereich, um alle experimentelle Funktionen zu testen</h1>
+    <button type="button" onclick="document.location.href='./index.html';" name="button">Zurück</button>
+
+
+    <script type="text/javascript">
+      var PromiseFtp = require('promise-ftp');
+      var ftp = new PromiseFtp();
+
+
+      function ftpowo() {
+        ftp.connect({host: "localhost", user: "UnoUser", password: ""})
+          .then(function (serverMessage) {
+            console.log('Server message: '+serverMessage);
+            return ftp.list('/');
+          }).then(function (list) {
+            console.log('Directory listing:');
+            console.dir(list);
+            return ftp.end();
+          });
+      }
+
+      function ftplogin()
+      {
+        return ftp.connect({host: "localhost", user: "UnoUser", password: ""});
+        ftpping();
+      }
+
+      function ftpowo() {
+        ftp.connect({host: "localhost", user: "UnoUser", password: ""})
+          .then(function (serverMessage) {
+            //console.log('Server message: '+serverMessage);
+            return ftp.list('/');
+          }).then(function (list) {
+            console.log('Directory listing:');
+            console.dir(list);
+            return ftp.end();
+          });
+      }
+
+      function UnoFTP(Befehl, Parameter) {
+        switch (Befehl) {
+          case "connect": return ftp.connect({host: "localhost", user: "UnoUser", password: ""}); break;
+          case "list": return ftp.list(Parameter).then(function (list) { console.dir(list);}); break;
+          case "delete": return ftp.delete(Parameter).then(function() { console.warn("Erfolgreich gelöscht");}); break;
+          case "": return 0; break;
+          case "": return 0; break;
+          case "": return 0; break;
+          case "": return 0; break;
+          case "": return 0; break;
+        }
+      }
+
+        function ftpping() {
+          var minutes = 1, the_interval = minutes * 60 * 1000;
+          setInterval(function() {
+          console.log("Ping...");
+          return ftp.list("/");
+        }, the_interval);
+        }
+
+
+        let Spieler1Daten = class {
+          constructor(Karten, Farbe)
+          {
+            this.Karten = "owo";
+            this.Farben = "Blau";
+          }
+        };
+        let Spieler1 = new Spieler1Daten();
+    </script>
+  </body>
+</html>

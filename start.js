@@ -9,6 +9,7 @@ function createWindow(){
   //BrowserFenster wird geöffnet
   win = new BrowserWindow({width:1920, height: 1080, icon:__dirname+'./img/Icon.png'});
 
+
     //Index.html wird geladen
     win.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),
@@ -17,7 +18,9 @@ function createWindow(){
     }));
 
     //Dev-Tools öffnen
+    //win.setMenu(null);
    win.webContents.openDevTools();
+   win.maximize();
 
    win.on('closed', () => {
      win = null;

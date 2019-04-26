@@ -2,7 +2,28 @@ async function UnoInit() {
   if (CONLOG == true) {
     console.log("UnoInit();");
   }
+/*
+Kartenverteilung:
 
+108 Möglichkeiten
+1-8 = Spezial
+9-12 = Super Spezial
+14-22 = Spezial
+23-108 = Normal
+
+108 Gesamte Möglichkeiten
+88 Normale
+16 Speziale
+4 Super Speziale
+
+81,481% Normale Karte
+14,814% Speziale Karte
+3,703% Super Speziale Karte
+
+= 99,998% gesamt?!
+
+
+*/
 
 
   let Spieler1Karten; //Alle Karten von Spieler1
@@ -17,12 +38,19 @@ async function UnoInit() {
   let LoadingBarState = true;
   //let Multiplayer = false;
   let Server = [];
-  let belegt2 = "owo";
-  await NameVonSQL();
 }
+
+async function leave() {
+  if (Multiplayer) {
+    await dat("UPDATE server"+belegt2+" SET SP1left = TRUE");
+  }
+  document.location.href = "./index.html";
+}
+var belegt2 = "";
 let Multiplayer = false;
 let isInGame = false;
-let Server1 = -1;
+let server1 = -1;
+var Zug = 0;
 
 async function Abfrage()
 {
@@ -45,19 +73,19 @@ async function Abfrage()
     console.log(SpielerNamen);
 
     //Spieler1Name = SpielerNamen[0]
-    Server1 = await dat("SELECT * FROM INUSE;");
+    server1 = await dat("SELECT * FROM INUSE;");
     //Erzeuge Tabelle, falls sie noch nicht existiert!
-    await dat("CREATE TABLE IF NOT EXISTS INUSE (Server1 boolean NOT NULL, Server2 boolean NOT NULL, Server3 boolean NOT NULL, Server4 boolean NOT NULL, Server5 boolean NOT NULL);");
+    await dat("CREATE TABLE IF NOT EXISTS INUSE (server1 boolean NOT NULL, server2 boolean NOT NULL, server3 boolean NOT NULL, server4 boolean NOT NULL, server5 boolean NOT NULL);");
     //await dat_alt();
     console.warn("TABLE INITIALISIERT");
-    //Server1 = await dat("SELECT * FROM INUSE;");
+    //server1 = await dat("SELECT * FROM INUSE;");
     console.log("Verbinde mit Datenbank...");
     await Sleep(1000);
     console.log("Verbunden");
-    console.log(typeof Server1);
-    console.log(Server1);
+    console.log(typeof server1);
+    console.log(server1[0]);
     let errcount = 0;
-    while (Server1 === undefined && errcount < 6) {
+    while (server1 === undefined && errcount < 6) {
       errcount++;
       await Sleep(100);
       if (errcount == 5) {
@@ -71,48 +99,43 @@ async function Abfrage()
       }
       console.log(errcount);
       console.log("Erneut");
-      // Server1 = await dat("SELECT * FROM INUSE;");
-      // console.log(Server1);
+      // server1 = await dat("SELECT * FROM INUSE;");
+      // console.log(server1);
       // await Sleep(10);
     }
-    console.log(Server1);
+    console.log(server1);
     console.log(myEmitter);
-    if (Server1[0].Server1 == 0) {
-      await dat("UPDATE INUSE SET Server1 = TRUE;"); //Server 1 belegen || Use Server 1
-      await dat("UPDATE Server1 SET EMPTY = FALSE");
-      await dat("UPDATE Server1 SET FULL = FALSE");
+    if (server1[0].Server1 == 0) {
+      await dat("UPDATE INUSE SET server1 = TRUE;"); //Server 1 belegen || Use Server 1
+      await dat("UPDATE server1 SET FULL = FALSE, EMPTY = FALSE, SP1left = FALSE, SP2left = FALSE;");
        belegt = 1;
        belegt2 = belegt;
        //return belegt;
     }
-    else if (Server1[0].Server2 == 0) {
-      await dat("UPDATE INUSE SET Server2 = TRUE;"); //Server 2 belegen
-      await dat("UPDATE Server2 SET EMPTY = FALSE");
-      await dat("UPDATE Server2 SET FULL = FALSE");
+    else if (server1[0].Server2 == 0) {
+      await dat("UPDATE INUSE SET server2 = TRUE;"); //Server 2 belegen
+      await dat("UPDATE server2 SET FULL = FALSE, EMPTY = FALSE, SP1left = FALSE, SP2left = FALSE;");
       const belegt = 2;
       belegt2 = belegt;
       //return belegt;
     }
-    else if (Server1[0].Server3 == 0) {
-      await dat("UPDATE INUSE SET Server3 = TRUE;"); //Server 3 belegen
-      await dat("UPDATE Server3 SET EMPTY = FALSE");
-      await dat("UPDATE Server3 SET FULL = FALSE");
+    else if (server1[0].Server3 == 0) {
+      await dat("UPDATE INUSE SET server3 = TRUE;"); //Server 3 belegen
+      await dat("UPDATE server3 SET FULL = FALSE, EMPTY = FALSE, SP1left = FALSE, SP2left = FALSE;");
       const belegt = 3;
       belegt2 = belegt;
       //return belegt;
     }
-    else if (Server1[0].Server4 == 0) {
-      await dat("UPDATE INUSE SET Server4 = TRUE;"); //Server 4 belegen
-      await dat("UPDATE Server4 SET EMPTY = FALSE;");
-      await dat("UPDATE Server4 SET FULL = FALSE");
+    else if (server1[0].Server4 == 0) {
+      await dat("UPDATE INUSE SET server4 = TRUE;"); //Server 4 belegen
+      await dat("UPDATE server4 SET FULL = FALSE, EMPTY = FALSE, SP1left = FALSE, SP2left = FALSE;");
       const belegt = 4;
       belegt2 = belegt;
       //return belegt;
     }
-    else if (Server1[0].Server5 == 0) {
-      await dat("UPDATE INUSE SET Server5 = TRUE;"); //Server 5 belegen
-      await dat("UPDATE Server5 SET EMPTY = FALSE");
-      await dat("UPDATE Server5 SET FULL = FALSE");
+    else if (server1[0].Server5 == 0) {
+      await dat("UPDATE INUSE SET server5 = TRUE;"); //Server 5 belegen
+      await dat("UPDATE server5 SET FULL = FALSE, EMPTY = FALSE, SP1left = FALSE, SP2left = FALSE;");
       const belegt = 5;
       belegt2 = belegt;
       //return belegt;
@@ -122,51 +145,34 @@ async function Abfrage()
       location.reload();
     }
     JSAlert.alert("Es wurde Server "+belegt2+" ausgewählt!");
-    await dat("UPDATE SERVER"+belegt2+" SET Spieler1IP = '"+IPAdresse+"', Spieler1Name = '"+Spieler1Name+"';");
-    WaitForPlayer();
-    return belegt;
+    Spieler1Name = await dat("SELECT * FROM spielernamen;");
+    Spieler1Name = Spieler1Name[0].Spieler1;
+    await dat("UPDATE server"+belegt2+" SET Spieler1IP = '"+IPAdresse+"', Spieler1Name = '"+Spieler1Name+"';");
+    await WarteAufSP2();
 }
 
 
-async function WaitForPlayer()
+async function WarteAufSP2() {
+  return new Promise( async (resolve, reject) =>
 {
-  let Warten = document.getElementById("WartenDIV");
-  Warten.innerHTML += "Warten auf Spieler...";
-  let waiting;
-  let ccounter;
-  while (!waiting[0].FULL) {
-    ccounter++;
-    await Sleep(1000);
-    waiting = await dat("SELECT * FROM Server"+belegt2+";");
-    if (ccounter > 60) {
-      alert("Timeout!");
-      Freigeben();
-      break;
+  JSAlert.alert("Warte auf Spieler2...");
+  console.log("oof");
+  document.getElementById("startUno").setAttribute("disabled", "");
+  await dat("UPDATE server"+belegt2+" SET SP1Bereit = TRUE;");
+    let SP2Bereit = await dat("SELECT * FROM server"+belegt2+";");
+    let tmpSP;
+    SP2Bereit = SP2Bereit[0].SP2Bereit;
+    while (!SP2Bereit) {
+      await Sleep(1000);
+      tmpSP = await dat("SELECT * FROM server"+belegt2+";");
+      SP2Bereit = tmpSP[0].SP2Bereit;
     }
-  }
+    console.log("FERTIG");
+    document.getElementById("startUno").removeAttribute("disabled");
+    resolve();
+});
+
 }
-
-
-
-
-
-async function Freigeben()
-{
-  switch (belegt2) {
-    case 1: await dat("UPDATE INUSE SET Server1 = FALSE;"); await dat("UPDATE Server1 SET FULL = FALSE, EMPTY = TRUE;"); break;
-    case 2: await dat("UPDATE INUSE SET Server2 = FALSE;"); await dat("UPDATE Server2 SET FULL = FALSE, EMPTY = TRUE;"); break;
-    case 3: await dat("UPDATE INUSE SET Server3 = FALSE;"); await dat("UPDATE Server3 SET FULL = FALSE, EMPTY = TRUE;"); break;
-    case 4: await dat("UPDATE INUSE SET Server4 = FALSE;"); await dat("UPDATE Server4 SET FULL = FALSE, EMPTY = TRUE;"); break;
-    case 5: await dat("UPDATE INUSE SET Server5 = FALSE;"); await dat("UPDATE Server5 SET FULL = FALSE, EMPTY = TRUE;"); break;
-    default: Fehler(4); //Server konnte nicht freigegeben werden!
-
-  }
-  console.warn("Server "+belegt2+" wurde wieder freigegeben!");
-}
-
-
-
-
 let HM = document.getElementById("HM");
 
 async function change()
@@ -191,17 +197,20 @@ $("#FARBWUNSCH_WAHLPLUS4").hide();
 
 let log = document.getElementById("LOG");
 
-let SpielerNamen;
+let Spielernamen;
 
 async function NameVonSQL()
 {
   await dat("CREATE TABLE IF NOT EXISTS spielernamen (Spieler1 VARCHAR(255), Spieler2 VARCHAR(255));");
-  SpielerNamen = await dat("SELECT * FROM spielernamen;");
-  await Sleep(1000);
-  console.log(SpielerNamen);
-  if (SpielerNamen.length == 0 || SpielerNamen == undefined) {
+  Spielernamen = await dat("SELECT * FROM server"+belegt2+";");
+  Spieler1Name = Spielernamen[0].Spieler1Name;
+  Spieler2Name = Spielernamen[0].Spieler2Name;
+  Spielernamen = [Spieler1Name, Spieler2Name];
+  //await Sleep(1000);
+  console.log(Spielernamen);
+  if (Spielernamen.length == 0 || Spielernamen == undefined) {
     console.warn("Spielernamen ist leer. Daten werden zurückgesetzt");
-    await dat("INSERT INTO spielernamen VALUES('Spieler1', 'Spieler2');");
+    await dat("UPDATE spielernamen VALUES('Spieler1', 'Spieler2');");
     if (!isInGame) {
       NameVonSQL();
     }
@@ -209,36 +218,52 @@ async function NameVonSQL()
     return 0;
   }
   else {
-    await Sleep(100);
-    Spieler1Name = SpielerNamen[0].Spieler1;
-    await dat("INSERT INTO spielernamen VALUES('Spieler1', 'Spieler2');");
-    Spieler2Name = SpielerNamen[0].Spieler2;
-      if (SpielerNamen[0].Spieler1 == "") {
+    //await Sleep(100);
+    Spieler1Name = Spielernamen[0].Spieler1Name;
+    Spieler2Name = Spielernamen[0].Spieler2Name;
+      if (Spieler1Name == "") {
         Spieler1Name = "Spieler 1";
         console.warn("Spieler1 zurückgesetzt");
       }
-      if (SpielerNamen[0].Spieler2 == "") {
+      if (Spieler2Name == "") {
         Spieler2Name = "Spieler 2"; //Falls Name nicht eingegeben wurde
         console.warn("Spieler2 zurückgesetzt");
       }
   }
-
-
 }
 
 async function UnoStart() {
+  console.warn("UnoInit();");
   await UnoInit();
-  await NameVonSQL();
-  document.getElementById("Spieler1NameFeld").innerHTML+= Spieler1Name;
-  document.getElementById("Spieler2NameFeld").innerHTML+= Spieler2Name;
+  console.warn("UnoInit();");
+  if (Multiplayer) {
+    await dat("UPDATE server"+belegt2+" SET Zug = 1");
+    await NameVonSQL();
+    document.getElementById("Spieler1NameFeld").innerHTML+= Spielernamen[0];
+    document.getElementById("Spieler2NameFeld").innerHTML+= Spielernamen[1];
+  }
+  console.warn("getKarten();");
   await getKarten();
+  console.warn("OwO();");
   await OwO();
+  console.warn("ETZ();");
   await ETZ();
+  console.warn("FirstCardF();");
   await FirstCardF();
+
+  if (Multiplayer) {
+    console.warn("Upload();");
+    await Upload();
+  }
   $("#UNOSCREEN").show();
   isInGame = true;
+  if (Multiplayer) {
+    await dat("UPDATE server"+belegt2+" SET gestartet = TRUE;");
+  }
   $("#startUno").hide();
   document.getElementById("RundeBeenden").setAttribute("disabled", "");
+  DownloadLoop(500);
+  return;
 }
 
 function LOG()
@@ -252,38 +277,80 @@ function LOG()
   }
 }
 
-async function Name()
+async function Upload()
 {
-  if (CONLOG == true) {
-    console.log("Name();");
+  return new Promise(async (resolve, reject) =>
+{
+  Zug = 2;
+  await dat("UPDATE server"+belegt2+" SET Spieler1Karten='"+Spieler1Karten.toString()+"', Spieler1KartenFarbe='"+Spieler1KartenFarbe.toString()+"', Spieler2Karten='"+Spieler2Karten.toString()+"', Spieler2KartenFarbe='"+Spieler2KartenFarbe.toString()+"', Zug = '"+Zug+"';");
+  resolve();
+});
+}
+async function WaitForPlayerTwo()
+{
+  JSAlert.alert("Warte auf "+Spielernamen[1]).dismissIn(1000 * 5);
+  return new Promise(async (resolve, reject) =>
+{
+  let oop = await dat("SELECT * FROM server"+belegt2+";");
+  let Zeit1 = 0;
+  while (oop[0].Zug == 2) {
+    console.log("Nicht am Zug");
+    Verbieten();
+    Zeit1++;
+    await Sleep(900);
+    oop = await dat("SELECT * FROM server"+belegt2+";");
+    document.getElementById("WartenDIV").innerHTML = "Warte auf "+Spielernamen[1]+"... "+Zeit1+" Sekunden...";
   }
-  document.body.innerHTML += '<div id="Namenn" >Gebt eure Namen ein! <br> <input type="text" id="Spieler1Name_" placeholder="Spieler 1"> <br> <input type="text" id="Spieler2Name_" placeholder="Spieler 2"> <button class="btn btn-success" onclick="setName();">Bestätigen</button></div>';
-  await Sleep(100000000000);
-
+  Erlauben();
+  resolve();
+})
 }
 
-async function setName()
+async function Verbieten()
 {
-  if (CONLOG == true) {
-    console.log("setName();");
-  }
-  Spieler1Name = document.getElementById("Spieler1Name_").value;
-  Spieler2Name = document.getElementById("Spieler2Name_").value;
-  if (Spieler1Name == Spieler2Name)
-  {
-    JSAlert.alert("Bitte nicht die selben Namen verwenden");
-  }
-    else {
-      $("#Namenn").hide();
-      await OpenUno();
-      await Sleep(1000);
-      while (Spieler1Name == "Spieler 1") {}
-      while (Spieler2Name == "Spieler 2") {}
-      document.getElementById("SPIELSCREEN").innerHTML = '<button type="button" class="btn btn-warning btn-block" name="button">Karten von '+Spieler2Name+'</button>';
-      document.getElementById("Trennwand").innerHTML = '<button type="button" class="btn btn-warning btn-block" name="button">Karten von '+Spieler1Name+'</button>';
-  }
-
+  document.getElementById("Ziehen").setAttribute("disabled", "");
+  document.getElementById("KarteLegen").setAttribute("disabled", "");
+  document.getElementById("WartenDIV").innerHTML = Spielernamen[1]+" ist dran";
 }
+
+async function Erlauben()
+{
+  document.getElementById("Ziehen").removeAttribute("disabled");
+  document.getElementById("KarteLegen").removeAttribute("disabled");
+  document.getElementById("WartenDIV").innerHTML = "Du bist dran";
+}
+
+// async function Name()
+// {
+//   if (CONLOG == true) {
+//     console.log("Name();");
+//   }
+//   document.body.innerHTML += '<div id="Namenn" >Gebt eure Namen ein! <br> <input type="text" id="Spieler1Name_" placeholder="Spieler 1"> <br> <input type="text" id="Spieler2Name_" placeholder="Spieler 2"> <button class="btn btn-success" onclick="setName();">Bestätigen</button></div>';
+//   await Sleep(100000000000);
+// }
+
+// async function setName()
+// {
+//   if (CONLOG == true) {
+//     console.log("setName();");
+//   }
+//   Spieler1Name = document.getElementById("Spieler1Name_").value;
+//   Spieler2Name = document.getElementById("Spieler2Name_").value;
+//   if (Spieler1Name == Spieler2Name)
+//   {
+//     JSAlert.alert("Bitte nicht die selben Namen verwenden");
+//   }
+//     else {
+//       $("#Namenn").hide();
+//       await OpenUno();
+//       await Sleep(1000);
+//       while (Spieler1Name == "Spieler 1") {}
+//       while (Spieler2Name == "Spieler 2") {}
+//       document.getElementById("SPIELSCREEN").innerHTML = '<button type="button" class="btn btn-warning btn-block" name="button">Karten von '+Spieler2Name+'</button>';
+//       document.getElementById("Trennwand").innerHTML = '<button type="button" class="btn btn-warning btn-block" name="button">Karten von '+Spieler1Name+'</button>';
+//   }
+//
+// }
 
 async function OpenUno()
 {
@@ -312,224 +379,331 @@ async function graphic()
   }
    document.getElementById("UNOSPIELER1SCREEN").innerHTML = "";
    document.getElementById("UNOSPIELER2SCREEN").innerHTML = "";
-  //await Sleep(1000);
-  if (welcherSpieler == 1) {
-
-    for (var i = 0; i <= Spieler1Karten.length; i++) {
-      switch (Spieler1Karten[i]) {
-
-
-        case "0": switch (Spieler1KartenFarbe[i]) {
-          case "ROT": SC1.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/0R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/0B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/0GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/0GE.png'>";  break;
-        } break;
-
-        case "1": switch (Spieler1KartenFarbe[i]) {
-          case "ROT": SC1.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/1R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/1B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/1GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");;'id='SP1Karte"+i+"'  src='./img/Uno/Karten/1GE.png'>"; break;
-        } break;
-
-        case "2": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2GE.png'>"; break;
-        } break;
-
-        case "3": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3GE.png'>";  break;
-        } break;
-
-        case "4": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4GE.png'>"; break;
-        } break;
-
-        case "5": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5GE.png'>";  break;
-        } break;
-
-        case "6": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/6R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/6B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/6GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/6GE.png'>";  break;
-        } break;
-
-        case "7": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/7R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/7B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/7GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/7GE.png'>";  break;
-        } break;
-
-        case "8": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/8R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/8B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/8GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/8GE.png'>";  break;
-        } break;
-
-        case "9": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/9R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/9B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/9GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/9GE.png'>";  break;
-        } break;
-
-        case "NOKARTE": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/NOR.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/NOB.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/NOGR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/NOGE.png'>";  break;
-        } break;
-
-        case "RICHTUNGSWECHSEL": switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/WR.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WB.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WGR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WGE.png'>";  break;
-        } break;
-
-        case '+2': switch (Spieler1KartenFarbe[i]) {
-          case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/+2R.png'>";  break;
-          case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+2B.png'>";  break;
-          case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+2GR.png'>";  break;
-          case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+2GE.png'>";  break;
-        } break;
-
-        case '+4': SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+4.png'>"; break;
-        case 'FARBWUNSCH': SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WUNSCH.png'>"; break;
-      }
-    }
+   if (Multiplayer)
+   {
+     for (var i = 0; i <= Spieler1Karten.length; i++) {
+       switch (Spieler1Karten[i]) {
 
 
+         case "0": switch (Spieler1KartenFarbe[i]) {
+           case "ROT": SC1.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/0R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/0B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/0GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/0GE.png'>";  break;
+         } break;
 
-    for (var i = 0; i < Spieler2Karten.length; i++) {
-      SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
-    }
+         case "1": switch (Spieler1KartenFarbe[i]) {
+           case "ROT": SC1.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/1R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/1B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/1GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");;'id='SP1Karte"+i+"'  src='./img/Uno/Karten/1GE.png'>"; break;
+         } break;
 
-  }
-  else if(welcherSpieler == 2)
-  {
-    SC1.innerHTML = "";
-    SC2.innerHTML = "";
-    for (var i = 0; i <= Spieler1Karten.length; i++) {
-      SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
-    }
+         case "2": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2GE.png'>"; break;
+         } break;
 
-    for (var i = 0; i < Spieler2Karten.length; i++) {
-      switch (Spieler2Karten[i]) {
+         case "3": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3GE.png'>";  break;
+         } break;
+
+         case "4": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4GE.png'>"; break;
+         } break;
+
+         case "5": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5GE.png'>";  break;
+         } break;
+
+         case "6": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/6R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/6B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/6GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/6GE.png'>";  break;
+         } break;
+
+         case "7": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/7R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/7B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/7GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/7GE.png'>";  break;
+         } break;
+
+         case "8": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/8R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/8B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/8GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/8GE.png'>";  break;
+         } break;
+
+         case "9": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/9R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/9B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/9GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/9GE.png'>";  break;
+         } break;
+
+         case "NOKARTE": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/NOR.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/NOB.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/NOGR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/NOGE.png'>";  break;
+         } break;
+
+         case "RICHTUNGSWECHSEL": switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/WR.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WB.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WGR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WGE.png'>";  break;
+         } break;
+
+         case '+2': switch (Spieler1KartenFarbe[i]) {
+           case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/+2R.png'>";  break;
+           case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+2B.png'>";  break;
+           case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+2GR.png'>";  break;
+           case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+2GE.png'>";  break;
+         } break;
+
+         case '+4': SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+4.png'>"; break;
+         case 'FARBWUNSCH': SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WUNSCH.png'>"; break;
+       }
+     }
+     for (var i = 0; i < Spieler2Karten.length; i++) {
+       SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+     }
+   }
+   else
+   {
+     if (welcherSpieler == 1) {
+
+       for (var i = 0; i <= Spieler1Karten.length; i++) {
+         switch (Spieler1Karten[i]) {
 
 
-        case "0": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/0R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"'  src='./img/Uno/Karten/0B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/0GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/0GE.png'>";  break;
-        } break;
+           case "0": switch (Spieler1KartenFarbe[i]) {
+             case "ROT": SC1.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/0R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/0B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/0GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/0GE.png'>";  break;
+           } break;
 
-        case "1": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"'src='./img/Uno/Karten/1R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/1B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/1GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/1GE.png'>";  break;
-        } break;
+           case "1": switch (Spieler1KartenFarbe[i]) {
+             case "ROT": SC1.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/1R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/1B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/1GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");;'id='SP1Karte"+i+"'  src='./img/Uno/Karten/1GE.png'>"; break;
+           } break;
 
-        case "2": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"'src='./img/Uno/Karten/2R.png'>"; break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/2B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/2GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/2GE.png'>";  break;
-        } break;
+           case "2": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/2GE.png'>"; break;
+           } break;
 
-        case "3": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"'src='./img/Uno/Karten/3R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/3B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/3GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/3GE.png'>";  break;
-        } break;
+           case "3": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/3GE.png'>";  break;
+           } break;
 
-        case "4": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/4R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/4B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/4GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/4GE.png'>";  break;
-        } break;
+           case "4": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/4GE.png'>"; break;
+           } break;
 
-        case "5": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/5R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/5B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/5GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/5GE.png'>";  break;
-        } break;
+           case "5": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/5GE.png'>";  break;
+           } break;
 
-        case "6": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/6R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/6B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/6GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/6GE.png'>";  break;
-        } break;
+           case "6": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/6R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/6B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/6GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/6GE.png'>";  break;
+           } break;
 
-        case "7": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/7R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/7B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/7GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/7GE.png'>";  break;
-        } break;
+           case "7": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/7R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/7B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/7GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/7GE.png'>";  break;
+           } break;
 
-        case "8": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/8R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/8B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/8GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/8GE.png'>";  break;
-        } break;
+           case "8": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/8R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/8B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/8GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/8GE.png'>";  break;
+           } break;
 
-        case "9": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/9R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/9B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/9GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/9GE.png'>";  break;
-        } break;
+           case "9": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/9R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/9B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/9GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/9GE.png'>";  break;
+           } break;
 
-        case "NOKARTE": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/NOR.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/NOB.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/NOGR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/NOGE.png'>";  break;
-        } break;
+           case "NOKARTE": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/NOR.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/NOB.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/NOGR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/NOGE.png'>";  break;
+           } break;
 
-        case "RICHTUNGSWECHSEL": switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WR.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WB.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WGR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WGE.png'>";  break;
-        } break;
+           case "RICHTUNGSWECHSEL": switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/WR.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WB.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WGR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WGE.png'>";  break;
+           } break;
 
-        case '+2': switch (Spieler2KartenFarbe[i]) {
-          case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+2R.png'>";  break;
-          case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+2B.png'>";  break;
-          case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+2GR.png'>";  break;
-          case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+2GE.png'>";  break;
-        } break;
+           case '+2': switch (Spieler1KartenFarbe[i]) {
+             case "ROT":  SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"'  src='./img/Uno/Karten/+2R.png'>";  break;
+             case "BLAU": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+2B.png'>";  break;
+             case "GRÜN": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+2GR.png'>";  break;
+             case "GELB": SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+2GE.png'>";  break;
+           } break;
 
-        case '+4': SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+4.png'>"; break;
-        case 'FARBWUNSCH': SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WUNSCH.png'>"; break;
-      }
-  }
-}
+           case '+4': SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/+4.png'>"; break;
+           case 'FARBWUNSCH': SC1.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP1Karte"+i+"' src='./img/Uno/Karten/WUNSCH.png'>"; break;
+         }
+       }
+
+
+
+       for (var i = 0; i < Spieler2Karten.length; i++) {
+         SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+       }
+
+     }
+     else if(welcherSpieler == 2)
+     {
+       SC1.innerHTML = "";
+       SC2.innerHTML = "";
+       for (var i = 0; i <= Spieler1Karten.length; i++) {
+         SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+       }
+
+       for (var i = 0; i < Spieler2Karten.length; i++) {
+         switch (Spieler2Karten[i]) {
+
+
+           case "0": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/0R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"'  src='./img/Uno/Karten/0B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/0GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/0GE.png'>";  break;
+           } break;
+
+           case "1": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"'src='./img/Uno/Karten/1R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/1B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/1GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/1GE.png'>";  break;
+           } break;
+
+           case "2": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"'src='./img/Uno/Karten/2R.png'>"; break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/2B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/2GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/2GE.png'>";  break;
+           } break;
+
+           case "3": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"'src='./img/Uno/Karten/3R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/3B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/3GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/3GE.png'>";  break;
+           } break;
+
+           case "4": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/4R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/4B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/4GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/4GE.png'>";  break;
+           } break;
+
+           case "5": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/5R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/5B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/5GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/5GE.png'>";  break;
+           } break;
+
+           case "6": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/6R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/6B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/6GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/6GE.png'>";  break;
+           } break;
+
+           case "7": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/7R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/7B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/7GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/7GE.png'>";  break;
+           } break;
+
+           case "8": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/8R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/8B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/8GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/8GE.png'>";  break;
+           } break;
+
+           case "9": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/9R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/9B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/9GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/9GE.png'>";  break;
+           } break;
+
+           case "NOKARTE": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/NOR.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/NOB.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/NOGR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/NOGE.png'>";  break;
+           } break;
+
+           case "RICHTUNGSWECHSEL": switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WR.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WB.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WGR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WGE.png'>";  break;
+           } break;
+
+           case '+2': switch (Spieler2KartenFarbe[i]) {
+             case "ROT": SC2.innerHTML+= "<img  onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+2R.png'>";  break;
+             case "BLAU": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+2B.png'>";  break;
+             case "GRÜN": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+2GR.png'>";  break;
+             case "GELB": SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+2GE.png'>";  break;
+           } break;
+
+           case '+4': SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/+4.png'>"; break;
+           case 'FARBWUNSCH': SC2.innerHTML+= "<img onclick='CLICKLEGEN("+i+");' id='SP2Karte"+i+"' src='./img/Uno/Karten/WUNSCH.png'>"; break;
+         }
+     }
+   }
+   }
 return 0;
 }
 
@@ -562,11 +736,48 @@ $("#FARBWUNSCH_WAHL").hide();
 
 async function Legen(Karte)
 {
-
   if (CONLOG == true) {
     console.log("Legen(Karte);");
   }
 
+  if (Multiplayer) {
+    UnoKartenStapel = Spieler1Karten[Karte];
+    UnoKartenStapelFarbe = Spieler1KartenFarbe[Karte];
+    if(UnoKartenStapel == "FARBWUNSCH")
+    {
+      $("#FARBWUNSCH_WAHL").show();
+      document.getElementById("RundeBeenden").setAttribute("disabled", "");
+    }
+    if(UnoKartenStapel == "0")
+    {
+      await Spieler1KartenFarbe.splice(Karte,1);
+      await Spieler1Karten.splice(Karte,1);
+      await Tausch();
+    }
+    else if (UnoKartenStapel == "+2") {
+      for (var i = 0; i < 2; i++) {
+        Spieler2Karten.push(await Random(14));
+        Spieler2KartenFarbe.push(await RandomFarbe(3));
+      }
+      await convert();
+      await invalid();
+    }
+    else if (UnoKartenStapel == "+4") {
+      for (var i = 0; i < 4; i++) {
+        Spieler2Karten.push(await Random(14));
+        Spieler2KartenFarbe.push(await RandomFarbe(3));
+      }
+      await convert();
+      await invalid();
+
+      $("#FARBWUNSCH_WAHLPLUS4").show();
+      document.getElementById("RundeBeenden").setAttribute("disabled", "");
+    }
+    await Spieler1KartenFarbe.splice(Karte,1);
+    await Spieler1Karten.splice(Karte,1);
+    await dat("UPDATE server"+belegt2+" SET Spieler1Karten = '"+Spieler1Karten.toString()+"', Spieler1KartenFarbe = '"+Spieler1KartenFarbe.toString()+"', Spieler2Karten = '"+Spieler2Karten.toString()+"', Spieler2KartenFarbe = '"+Spieler2KartenFarbe.toString()+"';");
+  }
+  else {
     if (welcherSpieler == 1) {
       UnoKartenStapel = Spieler1Karten[Karte];
       UnoKartenStapelFarbe = Spieler1KartenFarbe[Karte];
@@ -642,6 +853,9 @@ async function Legen(Karte)
       await Spieler2KartenFarbe.splice(Karte,1);
       await Spieler2Karten.splice(Karte,1);
     }
+  } //ELSE ZUENEDE
+
+
     await StapelUpdate();
     await graphic();
     if (UnoKartenStapel == "NOKARTE" || UnoKartenStapel == "RICHTUNGSWECHSEL") {
@@ -649,10 +863,6 @@ async function Legen(Karte)
     }
     if (UnoKartenStapel != "FARBWUNSCH" && UnoKartenStapel != "NOKARTE" && UnoKartenStapel != "RICHTUNGSWECHSEL" && UnoKartenStapel != "+4") {
       weiter();
-    }
-
-    if (Multiplayer) {
-      dat("UPDATE Server"+belegt2+" SET Spieler1Karten = '"+Spieler1Karten.toString()+"', Spieler1KartenFarbe = '"+Spieler1KartenFarbe.toString()+"', Spieler2Karten = '"+Spieler2Karten.toString()+"', Spieler2KartenFarbe = '"+Spieler2KartenFarbe.toString()+"';");
     }
 }
 
@@ -852,54 +1062,87 @@ function LogLog(text)
   UnoLog.innerHTML = text;
 }
 
+async function DownloadLoop(looptime)
+{
+  while (true) {
+    await Sleep(looptime);
+    await Download();
+    graphic();
+  }
+}
+
 async function weiter()
 {
   //löschen("TransID"-1);
   document.querySelectorAll('.tra').forEach(function(a){
 a.remove()
 })
-  if (CONLOG == true) {
-    console.log("weiter();");
-  }
-  if (Spieler1Karten.length <= 0) {
-    Gewonnen(1);
-  }
-  else if (Spieler2Karten.length <= 0) {
-    Gewonnen(2);
-  }
+  if (Multiplayer) {
+    let zuu = await dat("SELECT * FROM server"+belegt2+";");
+    Spieler1Karten = await zuu[0].Spieler1Karten.split(",");
+    Spieler1KartenFarbe = await zuu[0].Spieler1KartenFarbe.split(",");
+    Spieler2Karten = await zuu[0].Spieler2Karten.split(",");
+    Spieler2KartenFarbe = await zuu[0].Spieler2KartenFarbe.split(",");
+    if (Spieler1Karten.length <= 0) {
+      Gewonnen(1);
+    }
+    else if (Spieler2Karten.length <= 0) {
+      Gewonnen(2);
+    }
+    document.getElementById("Kartennummer").value = "";
+    SC1.innerHTML = "";
+    SC2.innerHTML = "";
+    for (var i = 0; i < Spieler2Karten.length; i++) {
+      SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+    }
+    await Upload();
+    await WaitForPlayerTwo();
+    graphic();
+    document.getElementById("Ziehen").removeAttribute("disabled", "");
+    document.getElementById("KarteLegen").removeAttribute("disabled", "");
+    document.getElementById("RundeBeenden").setAttribute("disabled", "");
+    $("#FARBWUNSCH_WAHLPLUS4").hide();
 
-  document.getElementById("Kartennummer").value = "";
-  if (welcherSpieler == 1) {
-    welcherSpieler = 2;
   }
   else {
-    welcherSpieler = 1;
-  }
-  SC1.innerHTML = "";
-  SC2.innerHTML = "";
-  for (var i = 0; i < Spieler2Karten.length; i++) {
-     SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
-  }
-  for (var i = 0; i < Spieler1Karten.length; i++) {
-     SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
-  }
+    if (CONLOG == true) {
+      console.log("weiter();");
+    }
+    if (Spieler1Karten.length <= 0) {
+      Gewonnen(1);
+    }
+    else if (Spieler2Karten.length <= 0) {
+      Gewonnen(2);
+    }
 
-  await Sleep(100);
+    document.getElementById("Kartennummer").value = "";
+    if (welcherSpieler == 1) {
+      welcherSpieler = 2;
+    }
+    else {
+      welcherSpieler = 1;
+    }
+    SC1.innerHTML = "";
+    SC2.innerHTML = "";
+    for (var i = 0; i < Spieler2Karten.length; i++) {
+       SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+    }
+    for (var i = 0; i < Spieler1Karten.length; i++) {
+       SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+    }
+    alert("Gebe an Spieler " + welcherSpieler + " weiter\n\nSpieler " + welcherSpieler + ": bitte bestätige mit OK");
+    graphic();
 
-  alert("Gebe an Spieler " + welcherSpieler + " weiter\n\nSpieler " + welcherSpieler + ": bitte bestätige mit OK");
-  //await Sleep(100);
-  graphic();
-
-  log.innerHTML += document.getElementById("UnoLog").innerHTML + "<br>";
-  document.getElementById("Ziehen").removeAttribute("disabled", "");
-  document.getElementById("KarteLegen").removeAttribute("disabled", "");
-  document.getElementById("RundeBeenden").setAttribute("disabled", "");
-  $("#FARBWUNSCH_WAHLPLUS4").hide();
+    log.innerHTML += document.getElementById("UnoLog").innerHTML + "<br>";
+    document.getElementById("Ziehen").removeAttribute("disabled", "");
+    document.getElementById("KarteLegen").removeAttribute("disabled", "");
+    document.getElementById("RundeBeenden").setAttribute("disabled", "");
+    $("#FARBWUNSCH_WAHLPLUS4").hide();
+  }
 }
 
 async function weiters()
 {
-
   if (CONLOG == true) {
     console.log("weiters();");
   }
@@ -910,24 +1153,67 @@ async function weiters()
   else if (Spieler2Karten.length <= 0) {
     Gewonnen(2);
   }
-
   document.getElementById("Kartennummer").value = "";
-  SC1.innerHTML = "";
+  //SC1.innerHTML = "";
   SC2.innerHTML = "";
-  for (var i = 0; i < Spieler2Karten.length; i++) {
-     SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
-  }
+  if (Multiplayer) {
+    for (var i = 0; i < Spieler2Karten.length; i++) {
+      SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+    }
+    await Upload();
+    await WaitForPlayerTwo();
+    graphic();
 
-  for (var i = 0; i < Spieler1Karten.length; i++) {
-     SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
   }
-  graphic();
+  else {
 
+
+    for (var i = 0; i < Spieler2Karten.length; i++) {
+       SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+    }
+
+    for (var i = 0; i < Spieler1Karten.length; i++) {
+       SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+    }
+    graphic();
+  }
   log.innerHTML += document.getElementById("UnoLog").innerHTML + "<br>";
   document.getElementById("Ziehen").removeAttribute("disabled", "");
   document.getElementById("KarteLegen").removeAttribute("disabled", "");
   document.getElementById("RundeBeenden").setAttribute("disabled", "");
+
 }
+
+async function Download() {
+  return new Promise(async (resolve, reject) =>
+{
+  let ascx = await dat("SELECT * FROM server"+belegt2+";");
+  Spieler1Karten = ascx[0].Spieler1Karten.split(",");
+  Spieler1KartenFarbe = ascx[0].Spieler1KartenFarbe.split(",");
+  Spieler2Karten = ascx[0].Spieler2Karten.split(",");
+  Spieler2KartenFarbe = ascx[0].Spieler2KartenFarbe.split(",");
+  UnoKartenStapel = JSON.parse(ascx[0].Kartenstapel).Kartenstapel;
+  UnoKartenStapelFarbe = JSON.parse(ascx[0].Kartenstapel).KartenstapelFarbe;
+  Zug = ascx[0].Zug;
+  if (ascx[0].SP2left) {
+    alert(Spielernamen[1]+" hat das Spiel verlassen. Du kehrst nun zum Hauptmenü zurück");
+    await Freigeben(belegt2);
+    location.href = "./index.html";
+  }
+  resolve();
+});
+}
+
+// async function Upload()
+// {
+//   return new Promise(async (resolve, reject) =>
+// {
+//    let StapelKarte = {"Kartenstapel":FirstCard, "KartenstapelFarbe":FirstCardFarbe};
+//   await dat("UPDATE server"+belegt2+" SET Spieler1Karten='"+Spieler1Karten.toString()+"', Spieler1KartenFarbe='"+Spieler1KartenFarbe.toString()+"', Spieler2Karten='"+Spieler2Karten.toString()+"', Spieler2KartenFarbe='"+Spieler2KartenFarbe.toString()+"', Kartenstapel = '"+JSON.stringify(StapelKarte)+"';");
+//   resolve();
+// });
+// }
+
 
 function getKarten()
 {
@@ -944,18 +1230,32 @@ async function KarteZiehen()
   if (CONLOG == true) {
     console.log("KarteZiehen();");
   }
-  if (welcherSpieler == 1) {
+  if (Multiplayer)
+  {
     Spieler1Karten.push(await Random(14));
     Spieler1KartenFarbe.push(await RandomFarbe(3));
     await convert();
     await invalid();
+
   }
-  else {
-    Spieler2Karten.push(await Random(14));
-    Spieler2KartenFarbe.push(await RandomFarbe(3));
-    await convert();
-    await invalid();
+  else
+  {
+    if (welcherSpieler == 1)
+    {
+      Spieler1Karten.push(await Random(14));
+      Spieler1KartenFarbe.push(await RandomFarbe(3));
+      await convert();
+      await invalid();
+    }
+    else
+    {
+      Spieler2Karten.push(await Random(14));
+      Spieler2KartenFarbe.push(await RandomFarbe(3));
+      await convert();
+      await invalid();
+    }
   }
+
   graphic();
   document.getElementById("Ziehen").setAttribute("disabled", "");
   document.getElementById("KarteLegen").removeAttribute("disabled", "");
@@ -989,6 +1289,12 @@ async function OwO() {
   console.log("Spieler 1: " +Spieler1Karten + " \nFarbe: "+Spieler1KartenFarbe); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   console.log("Spieler 2: " +Spieler2Karten + " \nFarbe: "+Spieler2KartenFarbe); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
    //chunk(Spieler1Karten, 2);
+   if (Multiplayer) {
+     await dat("UPDATE server"+belegt2+" SET Spieler1Karten = '"+Spieler1Karten.toString()+"';");
+     await dat("UPDATE server"+belegt2+" SET Spieler1KartenFarbe = '"+Spieler1KartenFarbe.toString()+"';");
+     await dat("UPDATE server"+belegt2+" SET Spieler2Karten = '"+Spieler2Karten.toString()+"';");
+     await dat("UPDATE server"+belegt2+" SET Spieler2KartenFarbe = '"+Spieler2KartenFarbe.toString()+"';");
+   }
   return Spieler1Karten, Spieler2Karten, Spieler1KartenFarbe, Spieler2KartenFarbe;
 
 }
@@ -1120,8 +1426,8 @@ async function FirstCardF() {
       //convertFirstCard();
       console.log("Erste Karte: "+FirstCard +" "+FirstCardFarbe);
       if (Multiplayer) {
-        var FirstCardM = {"FirstCard":FirstCard, "FirstCardFarbe":FirstCardFarbe};
-        await dat("UPDATE Server"+belegt2+" SET KartenStapel = "+JSON.stringify(FirstCardFarbe)+";");
+        var FirstCardM = {"Kartenstapel":FirstCard, "KartenstapelFarbe":FirstCardFarbe};
+        await dat("UPDATE server"+belegt2+" SET Kartenstapel = '"+JSON.stringify(FirstCardM)+"';");
       }
       await Sleep(100);
       UnoKartenStapel = FirstCard;
@@ -1136,6 +1442,12 @@ async function StapelUpdate()
 {
   if (CONLOG == true) {
     console.log("StapelUpdate();");
+  }
+  if (Multiplayer) {
+    let lkm = await dat("SELECT * FROM server"+belegt2+";");
+    lkm = await JSON.parse(lkm[0].Kartenstapel);
+    UnoKartenStapel = lkm.Kartenstapel;
+    UnoKartenStapelFarbe = lkm.KartenstapelFarbe;
   }
   switch (UnoKartenStapel) {
     case "1": switch (UnoKartenStapelFarbe) {
@@ -1272,7 +1584,7 @@ function WunschGrün()
 }
 
 
-function WunschGelb()
+async function WunschGelb()
 {
   if (CONLOG == true) {
     console.log("WunschGelb();");
@@ -1283,7 +1595,7 @@ function WunschGelb()
   weiter();
 }
 
-function WunschRotPlus4()
+async function WunschRotPlus4()
 {
   if (CONLOG == true) {
     console.log("WunschRotPlus4();");
@@ -1294,7 +1606,7 @@ function WunschRotPlus4()
   weiter();
 }
 
-function WunschBlauPlus4()
+async function WunschBlauPlus4()
 {
   if (CONLOG == true) {
     console.log("WunschBlauPlus4();");
@@ -1305,7 +1617,7 @@ function WunschBlauPlus4()
   weiter();
 }
 
-function WunschGrünPlus4()
+async function WunschGrünPlus4()
 {
   if (CONLOG == true) {
     console.log("WunschGrünPlus4();");
@@ -1318,7 +1630,7 @@ function WunschGrünPlus4()
 
 $("Spieler1Name").hide();
 
-function WunschGelbPlus4()
+async function WunschGelbPlus4()
 {
   if (CONLOG == true) {
     console.log("WunschGelbPlus4();");
@@ -1342,13 +1654,30 @@ async function Gewonnen(Spieler)
   if (CONLOG == true) {
     console.log("Gewonnen();");
   }
-  alert("Herzlichen Glückwunsch Spieler " + Spieler + ". Du hast gewonnen!!!");
-  won = Spieler;
-  if (confirm("Möchtest du deinen Highscore eintragen lassen?")) {
-    inputname = document.getElementById("inputname").value;
-    $("#UNOSCREEN").hide();
-    $("#Formular").show();
+  if (Multiplayer) {
+    if (Spieler == 1) {
+      alert("Herzlichen Glückwunsch, du hast gewonnen!");
+      won = Spieler;
+      if (confirm("Möchtest du deinen Highscore eintragen lassen?")) {
+        inputname = document.getElementById("inputname").value;
+        $("#UNOSCREEN").hide();
+        $("#Formular").show();
 
+      }
+    }
+    else {
+      alert("Schade, du hast verloren");
+    }
+  }
+  else {
+    alert("Herzlichen Glückwunsch Spieler " + Spieler + ". Du hast gewonnen!!!");
+    won = Spieler;
+    if (confirm("Möchtest du deinen Highscore eintragen lassen?")) {
+      inputname = document.getElementById("inputname").value;
+      $("#UNOSCREEN").hide();
+      $("#Formular").show();
+
+    }
   }
   for (var i = 0; i <= Spieler1Karten.length; i++) {
     switch (Spieler1Karten[i]) {
@@ -1549,22 +1878,5 @@ async function Gewonnen(Spieler)
       case 'FARBWUNSCH': SC2.innerHTML+= "<img src='./img/Uno/Karten/WUNSCH.png'>"; break;
     }
   }
-
   //location.reload();
 }
-
-
-/*function KarteLegen() {
-  if(aktuelleKarte == gelegteKarte || aktuelleKarteFarbe == gelegteKarteFarbe)
-{
-  alert("Ja");
-  if (gelegteKarte == "0")
-  {
-    Tausch();
-  }
-}
-  else {
-    alert("Nein");
-  }
-}
-*/

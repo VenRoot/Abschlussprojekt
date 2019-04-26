@@ -24,9 +24,9 @@ function OfflineModus() {
 }
 
 const con = mysql.createConnection({
-  host: "*****",
+  host: "****",
   user: "ven",
-  password: "*****",
+  password: "****",
   database: "vendb"
 });
 

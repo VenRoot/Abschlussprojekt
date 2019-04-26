@@ -197,9 +197,10 @@ async function LoadServer()
 
 async function BetreteServer(Server)
 {
-  await dat("INSERT INTO PLACEHOLDER SET Server = "+Server+", IP = '"+IPAdresse+"';");
-  await dat("UPDATE Server"+Server+" SET Spieler2Name = "+preuser[0].username+", Spieler2IP = "+IPAdresse+", FULL = TRUE;");
-  document.location.href = "./Uno.html";
+  await fs.writeFileSync('./js/welcherServer.txt', Server, (err) => {if (err) throw err;});
+  //await dat("INSERT INTO placeholder SET Server = "+Server+", IP = '"+IPAdresse+"';");
+  await dat("UPDATE server"+Server+" SET Spieler2Name = '"+preuser[0].username+"', Spieler2IP = '"+IPAdresse+"', FULL = TRUE;");
+  document.location.href = "./UnoGast.html";
 }
 
 async function Server1Sim()
