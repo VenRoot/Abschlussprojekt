@@ -27,6 +27,22 @@ const md5 = require('js-md5');
 // 	maxLen: 30
 // });
 
+
+function KeyDownFn(evt) {
+		if(evt.keyCode == 73 && evt.ctrlKey && evt.shiftKey || evt.keyCode == 123)
+		{
+			if (isUserLoggedIn && preuser[0].username == "Ven") {
+				return;
+			}
+			else
+			{
+				evt.preventDefault();
+			}
+
+		}
+
+}
+
 var fs = require('fs'),
 	path = require('path');
 
@@ -34,7 +50,7 @@ var fs = require('fs'),
 async function OnlineServer() {
 	let qqq = await ping.promise.probe("prow.li");
 	if (qqq.avg == "unknown") {
-		let al = new JSAlert("Es konnte keine Verbindung zum Server hergestellt werden!\n\nBitte versuche es nochmal oder verwende den OFFLINE-MODUS", "Fehler!");
+		let al = new JSAlert.alert("Es konnte keine Verbindung zum Server hergestellt werden!\n\nBitte versuche es nochmal oder verwende den OFFLINE-MODUS", "Fehler!");
 		al.addButton("Erneut versuchen").then(function() {
 			location.reload();
 		});
@@ -60,8 +76,8 @@ function ftpowo() {
 
 function ftplogin()
 {
-	return ftp.connect({host: "localhost", user: "UnoUser", password: ""});
 	ftpping();
+	return ftp.connect({host: "localhost", user: "UnoUser", password: ""});
 }
 
 function ftpowo() {
@@ -374,11 +390,11 @@ var isKniffel = true;
 
 async function Save(Farbe) {
   //if (!settingsSQL) {
-    fs.writeFileSync('./js/dark.txt', DarkMode, (err) => {
+    fs.writeFileSync(__dirname+'/js/dark.txt', DarkMode, (err) => {
     if (err) throw err;
     console.log('Modus saved!');
     });
-    fs.writeFileSync('./js/rainbow.txt', isRainbow, (err) => {
+    fs.writeFileSync(__dirname+'/js/rainbow.txt', isRainbow, (err) => {
     if (err) throw err;
 
 
@@ -386,7 +402,7 @@ async function Save(Farbe) {
     });
 
     if (Farbe) {
-      fs.writeFileSync('./js/darkFarbe.txt', document.getElementById("foo").value, (err) => {
+      fs.writeFileSync(__dirname+'/js/darkFarbe.txt', document.getElementById("foo").value, (err) => {
       if (err) throw err;
       console.log('Farbe saved!');
       });
@@ -415,7 +431,7 @@ let Settings = {
 	 Settings.isRainbow = isRainbow;
 	 Settings.DarkMode = DarkMode;
 	 console.warn("SPEICHERN");
-     fs.writeFileSync('./js/settings.JSON', JSON.stringify(Settings), (err) => {
+     fs.writeFileSync(__dirname+'/js/settings.JSON', JSON.stringify(Settings), (err) => {
      if (err) throw err;
      console.log('Modus saved!');
 	 });
@@ -442,7 +458,7 @@ function checkForFile(fileName)
 
 async function Loadalt()
 {
-	await checkForFile("./js/settings.JSON")
+	await checkForFile(__dirname+"/js/settings.JSON")
 	  if (location.href.includes("index.html"))
 		{
 	     generateTable();
@@ -587,14 +603,14 @@ var haha;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////!bookmark!
 async function Load()
 {
-	fs.existsSync("./js/settings.JSON", {flag: "wx"}, function(err, data)
+	fs.existsSync(__dirname+"/js/settings.JSON", {flag: "wx"}, function(err, data)
 	{
 		if(exists)
 		{
 			callback();
 		}
 		else {
-			fs.writeFileSync("./js/settings.JSON", {flag: "wx"}, function(err, data)
+			fs.writeFileSync(__dirname+"/js/settings.JSON", {flag: "wx"}, function(err, data)
 		{
 			callback();
 		});
@@ -1108,11 +1124,11 @@ function Unwatch(Object, prototype) {
 async function Freigeben(svr)
 {
   switch (svr) {
-		case 1: await dat("UPDATE INUSE SET server1 = FALSE;"); await dat("UPDATE server1 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
-		case 2: await dat("UPDATE INUSE SET server2 = FALSE;"); await dat("UPDATE server2 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
-		case 3: await dat("UPDATE INUSE SET server3 = FALSE;"); await dat("UPDATE server3 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
-		case 4: await dat("UPDATE INUSE SET server4 = FALSE;"); await dat("UPDATE server4 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
-		case 5: await dat("UPDATE INUSE SET server5 = FALSE;"); await dat("UPDATE server5 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1;"); break;
+		case 1: await dat("UPDATE INUSE SET server1 = FALSE;"); await dat("UPDATE server1 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1, chat = '', SP1typing = FALSE, SP2typing = FALSE;"); break;
+		case 2: await dat("UPDATE INUSE SET server2 = FALSE;"); await dat("UPDATE server2 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1, chat = '', SP1typing = FALSE, SP2typing = FALSE;"); break;
+		case 3: await dat("UPDATE INUSE SET server3 = FALSE;"); await dat("UPDATE server3 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1, chat = '', SP1typing = FALSE, SP2typing = FALSE;"); break;
+		case 4: await dat("UPDATE INUSE SET server4 = FALSE;"); await dat("UPDATE server4 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1, chat = '', SP1typing = FALSE, SP2typing = FALSE;"); break;
+		case 5: await dat("UPDATE INUSE SET server5 = FALSE;"); await dat("UPDATE server5 SET Spieler1Karten = '', Spieler1KartenFarbe = '', Spieler2Karten = '', Spieler2KartenFarbe = '', Spieler1Name = '', Spieler2Name = '', Spieler1IP = '', Spieler2IP = '', Kartenstapel = '', FULL = FALSE, EMPTY = TRUE, SP1Bereit = FALSE, SP2Bereit = FALSE, SP1left = FALSE, SP2left = FALSE, gestartet = FALSE, Zug = 1, chat = '', SP1typing = FALSE, SP2typing = FALSE;"); break;
     default: Fehler(4); //Server konnte nicht freigegeben werden!
 
   }

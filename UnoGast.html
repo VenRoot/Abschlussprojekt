@@ -48,6 +48,13 @@
           <button type="button" class="btn btn-success" onclick='WunschGrünPlus4();' name="button">Grün</button>
           <button type="button" class="btn btn-primary" onclick='WunschBlauPlus4();' name="button">Blau</button>
         </div>
+        <div id="chat">
+          OwO dis a chat example
+        </div>
+        <div id="isTyping">
+
+        </div>
+        <input type="text" id="chatEingabe" placeholder="Gib hier deine Nachricht ein" onkeydown="preSend();">
       </div>
       <div id="SPIELSCREEN">
         <button id="Spieler2NameFeld" type="button" class="btn btn-warning btn-block" name="button">Karten von </button>
@@ -88,6 +95,7 @@
     await Sleep(10);
     $("#Formular").hide();
     console.warn("3");
+    check();
   }
 
     </script>

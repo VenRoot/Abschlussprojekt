@@ -1,8 +1,0 @@
-Multiplayer:
-
-1. Spieler1Karten und Spieler1KartenFarbe > JSON > await dat("UPDATE server SET Spieler1Karten = "+Spieler1Karten.JSON) > welcherSpieler = 2; > dat(); //FERTIG
-2. dat() Abfrage > hat Spieler2 Zug beendet? while(await dat("SELECT * FROM server")[0].welcherSpieler)
-3. Spieler1Karten herunterladen, dann stringify, anzeigen
-4. Spieler2Karten herunterladen und Anzahl ausgeben
-5. In Lobby, warten bis Spieler2 beigetreten ist, danach verifizieren
-6. Highscore

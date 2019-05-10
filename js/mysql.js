@@ -24,10 +24,11 @@ function OfflineModus() {
 }
 
 const con = mysql.createConnection({
-  host: "****",
+  host: "*****",
   user: "ven",
-  password: "****",
-  database: "vendb"
+  password: "*****",
+  database: "vendb",
+  port: "3306"
 });
 
 function connect()
@@ -103,6 +104,7 @@ async function dat(Befehl) {
 //   con.close();
 //   return result;
 // }
+
 
 async function dat3(Befehl) {
 

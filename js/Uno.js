@@ -61,7 +61,9 @@ async function Abfrage()
   else {
     gu = "Möchtest du im lokalen Multiplayer spielen?";
   }
-  if (!confirm(gu)) { //If local multiplayer is confimed
+  if (!confirm(gu)) { //If local multiplayer is canceled
+    $("chat").hide();
+    $("chatEingabe").hide();
     return;
   }
     Multiplayer = true;
@@ -153,24 +155,26 @@ async function Abfrage()
 
 
 async function WarteAufSP2() {
-  return new Promise( async (resolve, reject) =>
-{
-  JSAlert.alert("Warte auf Spieler2...");
-  console.log("oof");
-  document.getElementById("startUno").setAttribute("disabled", "");
-  await dat("UPDATE server"+belegt2+" SET SP1Bereit = TRUE;");
-    let SP2Bereit = await dat("SELECT * FROM server"+belegt2+";");
-    let tmpSP;
-    SP2Bereit = SP2Bereit[0].SP2Bereit;
-    while (!SP2Bereit) {
-      await Sleep(1000);
-      tmpSP = await dat("SELECT * FROM server"+belegt2+";");
-      SP2Bereit = tmpSP[0].SP2Bereit;
-    }
-    console.log("FERTIG");
-    document.getElementById("startUno").removeAttribute("disabled");
-    resolve();
-});
+  if (Multiplayer) {
+    return new Promise( async (resolve, reject) =>
+  {
+    JSAlert.alert("Warte auf Spieler2...");
+    console.log("oof");
+    document.getElementById("startUno").setAttribute("disabled", "");
+    await dat("UPDATE server"+belegt2+" SET SP1Bereit = TRUE;");
+      let SP2Bereit = await dat("SELECT * FROM server"+belegt2+";");
+      let tmpSP;
+      SP2Bereit = SP2Bereit[0].SP2Bereit;
+      while (!SP2Bereit) {
+        await Sleep(1000);
+        tmpSP = await dat("SELECT * FROM server"+belegt2+";");
+        SP2Bereit = tmpSP[0].SP2Bereit;
+      }
+      console.log("FERTIG");
+      document.getElementById("startUno").removeAttribute("disabled");
+      resolve();
+  });
+  }
 
 }
 let HM = document.getElementById("HM");
@@ -262,7 +266,7 @@ async function UnoStart() {
   }
   $("#startUno").hide();
   document.getElementById("RundeBeenden").setAttribute("disabled", "");
-  DownloadLoop(500);
+  DownloadLoop(1000);
   return;
 }
 
@@ -282,28 +286,35 @@ async function Upload()
   return new Promise(async (resolve, reject) =>
 {
   Zug = 2;
-  await dat("UPDATE server"+belegt2+" SET Spieler1Karten='"+Spieler1Karten.toString()+"', Spieler1KartenFarbe='"+Spieler1KartenFarbe.toString()+"', Spieler2Karten='"+Spieler2Karten.toString()+"', Spieler2KartenFarbe='"+Spieler2KartenFarbe.toString()+"', Zug = '"+Zug+"';");
+  if (UnoKartenStapel == "RICHTUNGSWECHSEL" ||UnoKartenStapel == "NOKARTE") {
+    Zug = 1;
+  }
+  let StapelUp = {"Kartenstapel":UnoKartenStapel, "KartenstapelFarbe":UnoKartenStapelFarbe};
+  console.log("UPDATE server"+belegt2+" SET Spieler1Karten='"+Spieler1Karten.toString()+"', Spieler1KartenFarbe='"+Spieler1KartenFarbe.toString()+"', Spieler2Karten='"+Spieler2Karten.toString()+"', KartenStapel = '"+JSON.stringify(StapelUp)+"', Spieler2KartenFarbe='"+Spieler2KartenFarbe.toString()+"', Zug = '"+Zug+"';");
+  await dat("UPDATE server"+belegt2+" SET Spieler1Karten='"+Spieler1Karten.toString()+"', Spieler1KartenFarbe='"+Spieler1KartenFarbe.toString()+"', Spieler2Karten='"+Spieler2Karten.toString()+"', KartenStapel = '"+JSON.stringify(StapelUp)+"', Spieler2KartenFarbe='"+Spieler2KartenFarbe.toString()+"', Zug = '"+Zug+"';");
   resolve();
 });
 }
 async function WaitForPlayerTwo()
 {
-  JSAlert.alert("Warte auf "+Spielernamen[1]).dismissIn(1000 * 5);
-  return new Promise(async (resolve, reject) =>
-{
-  let oop = await dat("SELECT * FROM server"+belegt2+";");
-  let Zeit1 = 0;
-  while (oop[0].Zug == 2) {
-    console.log("Nicht am Zug");
-    Verbieten();
-    Zeit1++;
-    await Sleep(900);
-    oop = await dat("SELECT * FROM server"+belegt2+";");
-    document.getElementById("WartenDIV").innerHTML = "Warte auf "+Spielernamen[1]+"... "+Zeit1+" Sekunden...";
+  if (Multiplayer) {
+    JSAlert.alert("Warte auf "+Spielernamen[1]).dismissIn(1000 * 5);
+    return new Promise(async (resolve, reject) =>
+  {
+    let oop = await dat("SELECT * FROM server"+belegt2+";");
+    let Zeit1 = 0;
+    while (oop[0].Zug == 2) {
+      console.log("Nicht am Zug");
+      Verbieten();
+      Zeit1++;
+      await Sleep(900);
+      oop = await dat("SELECT * FROM server"+belegt2+";");
+      document.getElementById("WartenDIV").innerHTML = "Warte auf "+Spielernamen[1]+"... "+Zeit1+" Sekunden...";
+    }
+    Erlauben();
+    resolve();
+  })
   }
-  Erlauben();
-  resolve();
-})
 }
 
 async function Verbieten()
@@ -481,7 +492,7 @@ async function graphic()
        }
      }
      for (var i = 0; i < Spieler2Karten.length; i++) {
-       SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+       SC2.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
      }
    }
    else
@@ -591,7 +602,7 @@ async function graphic()
 
 
        for (var i = 0; i < Spieler2Karten.length; i++) {
-         SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+         SC2.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
        }
 
      }
@@ -600,7 +611,7 @@ async function graphic()
        SC1.innerHTML = "";
        SC2.innerHTML = "";
        for (var i = 0; i <= Spieler1Karten.length; i++) {
-         SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+         SC1.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
        }
 
        for (var i = 0; i < Spieler2Karten.length; i++) {
@@ -775,7 +786,8 @@ async function Legen(Karte)
     }
     await Spieler1KartenFarbe.splice(Karte,1);
     await Spieler1Karten.splice(Karte,1);
-    await dat("UPDATE server"+belegt2+" SET Spieler1Karten = '"+Spieler1Karten.toString()+"', Spieler1KartenFarbe = '"+Spieler1KartenFarbe.toString()+"', Spieler2Karten = '"+Spieler2Karten.toString()+"', Spieler2KartenFarbe = '"+Spieler2KartenFarbe.toString()+"';");
+    // await dat("UPDATE server"+belegt2+" SET Spieler1Karten = '"+Spieler1Karten.toString()+"', Spieler1KartenFarbe = '"+Spieler1KartenFarbe.toString()+"', Spieler2Karten = '"+Spieler2Karten.toString()+"', Spieler2KartenFarbe = '"+Spieler2KartenFarbe.toString()+"';");
+      await Upload();
   }
   else {
     if (welcherSpieler == 1) {
@@ -923,8 +935,15 @@ async function Tausch()
   Spieler1KartenFarbe = Spieler2KartenFarbe;
   Spieler2KartenFarbe = tmp2;
 
-  await Sleep(100);
-  graphic();
+  if (Multiplayer) {
+    await Upload();
+    graphic();
+    weiter();
+
+  }
+  else {
+    graphic();
+  }
 }
 
 let owo;
@@ -1062,13 +1081,26 @@ function LogLog(text)
   UnoLog.innerHTML = text;
 }
 
+let Loopstop = false;
 async function DownloadLoop(looptime)
 {
-  while (true) {
-    await Sleep(looptime);
-    await Download();
-    graphic();
+  if (looptime == undefined) {
+    throw "Bitte geb Parameter mit an";
   }
+  else {
+    while (!Loopstop) {
+      await Sleep(looptime);
+      await Download();
+      graphic();
+  }
+
+  }
+}
+
+async function StopLoop() {
+  Loopstop = true;
+  await Sleep(1500);
+  Loopstop = false;
 }
 
 async function weiter()
@@ -1078,6 +1110,7 @@ async function weiter()
 a.remove()
 })
   if (Multiplayer) {
+    await Upload();
     let zuu = await dat("SELECT * FROM server"+belegt2+";");
     Spieler1Karten = await zuu[0].Spieler1Karten.split(",");
     Spieler1KartenFarbe = await zuu[0].Spieler1KartenFarbe.split(",");
@@ -1093,7 +1126,7 @@ a.remove()
     SC1.innerHTML = "";
     SC2.innerHTML = "";
     for (var i = 0; i < Spieler2Karten.length; i++) {
-      SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+      SC2.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
     }
     await Upload();
     await WaitForPlayerTwo();
@@ -1125,10 +1158,10 @@ a.remove()
     SC1.innerHTML = "";
     SC2.innerHTML = "";
     for (var i = 0; i < Spieler2Karten.length; i++) {
-       SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+       SC2.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
     }
     for (var i = 0; i < Spieler1Karten.length; i++) {
-       SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+       SC1.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
     }
     alert("Gebe an Spieler " + welcherSpieler + " weiter\n\nSpieler " + welcherSpieler + ": bitte bestätige mit OK");
     graphic();
@@ -1138,6 +1171,75 @@ a.remove()
     document.getElementById("KarteLegen").removeAttribute("disabled", "");
     document.getElementById("RundeBeenden").setAttribute("disabled", "");
     $("#FARBWUNSCH_WAHLPLUS4").hide();
+  }
+}
+
+async function preSend() {
+    if(event.key === 'Enter') {
+      if (document.getElementById("chatEingabe") == "") {
+        return;
+        //Breche ab, wenn nicht eingegeben wurde
+      }
+      else {
+        await dat("UPDATE server"+belegt2+" SET SP2typing = false");
+        await ChatSend();
+        document.getElementById("chatEingabe").value = "";
+      }
+    }
+    else {
+      await dat("UPDATE server"+belegt2+" SET SP2typing = true");
+    }
+}
+document.addEventListener('keypress', preSend);
+
+var lastMessage;
+
+async function ChatSend()
+{
+  return new Promise( async (resolve, reject) =>
+  {
+    if (Multiplayer) {
+      await dat("UPDATE server"+belegt2+" SET chat = '"+Spielernamen[0]+": "+document.getElementById("chatEingabe").value+"';");
+    }
+  });
+}
+
+async function ChatGet()
+{
+  if (Multiplayer) {
+
+    let isTyping = await dat("SELECT SP2typing from server"+belegt2+";");
+    isTyping = isTyping[0].SP2typing;
+    if (isTyping) {
+      document.getElementById("isTyping").innerHTML = Spielernamen[1]+" schreibt...";
+    }
+    else {
+      document.getElementById("isTyping").innerHTML = "";
+    }
+    let msg = await dat("SELECT chat from server"+belegt2);
+    msg = msg[0].chat;
+    console.log(msg);
+    if (msg != lastMessage)
+    {
+      lastMessage = msg;
+      document.getElementById("chat").innerHTML += "<br>"+lastMessage;
+    }
+  }
+}
+
+async function check()
+{
+  while (true)
+  {
+    ChatGet();
+    let tmp2 = document.getElementById("chatEingabe").value;
+    await Sleep(2000);
+    if (tmp2 != document.getElementById("chatEingabe").value) {
+      await dat("UPDATE server"+belegt2+" SET SP1typing = TRUE");
+    }
+    else {
+      await dat("UPDATE server"+belegt2+" SET SP1typing = FALSE");
+    }
   }
 }
 
@@ -1158,7 +1260,7 @@ async function weiters()
   SC2.innerHTML = "";
   if (Multiplayer) {
     for (var i = 0; i < Spieler2Karten.length; i++) {
-      SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+      SC2.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
     }
     await Upload();
     await WaitForPlayerTwo();
@@ -1169,11 +1271,11 @@ async function weiters()
 
 
     for (var i = 0; i < Spieler2Karten.length; i++) {
-       SC2.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+       SC2.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
     }
 
     for (var i = 0; i < Spieler1Karten.length; i++) {
-       SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+       SC1.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
     }
     graphic();
   }
@@ -1200,6 +1302,7 @@ async function Download() {
     await Freigeben(belegt2);
     location.href = "./index.html";
   }
+  await StapelUpdate();
   resolve();
 });
 }
@@ -1230,13 +1333,18 @@ async function KarteZiehen()
   if (CONLOG == true) {
     console.log("KarteZiehen();");
   }
+  document.getElementById("Ziehen").setAttribute("disabled", "");
+  document.getElementById("KarteLegen").removeAttribute("disabled", "");
+  document.getElementById("RundeBeenden").removeAttribute("disabled", "");
   if (Multiplayer)
   {
+    await StopLoop();
     Spieler1Karten.push(await Random(14));
     Spieler1KartenFarbe.push(await RandomFarbe(3));
     await convert();
     await invalid();
-
+    await Upload();
+    await DownloadLoop(1000);
   }
   else
   {
@@ -1257,9 +1365,7 @@ async function KarteZiehen()
   }
 
   graphic();
-  document.getElementById("Ziehen").setAttribute("disabled", "");
-  document.getElementById("KarteLegen").removeAttribute("disabled", "");
-  document.getElementById("RundeBeenden").removeAttribute("disabled", "");
+
 }
 
 
@@ -1311,7 +1417,7 @@ async function convert() {
     Spieler1Karten = Spieler1Karten.toString().replace(/14/i, "+4_");         //NOCH NICHT KONVERTIERT! SIEHE: INVALID()
   }
 
-    await Sleep(10);
+    //await Sleep(10);
     Spieler1Karten = Spieler1Karten.split(",");
 
 for (let f = 0; f < 100; f++) {
@@ -1322,7 +1428,7 @@ for (let f = 0; f < 100; f++) {
   Spieler2Karten = Spieler2Karten.toString().replace(/14/i, "+4_"); //NOCH NICHT KONVERTIERT! SIEHE: INVALID()
 }
 
-    await Sleep(10);
+    //await Sleep(10);
     Spieler2Karten = Spieler2Karten.split(",");
 }
 
@@ -1527,7 +1633,12 @@ async function StapelUpdate()
       case "BLAU": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WB.png'>"; break;
     } break;
 
-    case "FARBWUNSCH": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCH.png'>"; break;
+    case "FARBWUNSCH": switch (UnoKartenStapelFarbe) {
+      case "ROT": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHR.png'>"; break;
+      case "GELB": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGE.png'>"; break;
+      case "GRÜN": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGR.png'>"; break;
+      case "BLAU": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHB.png'>"; break;
+    } break;
 
     case "+2": switch (UnoKartenStapelFarbe) {
       case "ROT": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/+2R.png'>"; break;
@@ -1536,7 +1647,12 @@ async function StapelUpdate()
       case "BLAU": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/+2B.png'>"; break;
     } break;
 
-    case "+4": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/+4.png'>"; break;
+    case "+4": switch (UnoKartenStapelFarbe) {
+      case "ROT": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4R.png'>"; break;
+      case "GELB": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GE.png'>"; break;
+      case "GRÜN": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GR.png'>"; break;
+      case "BLAU": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4B.png'>"; break;
+    } break;
 
     case "NOKARTE": switch (UnoKartenStapelFarbe) {
       case "ROT": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/NOR.png'>"; break;
@@ -1550,36 +1666,42 @@ async function StapelUpdate()
 }
 
 
-function WunschRot()
+async function WunschRot()
 {
   if (CONLOG == true) {
     console.log("WunschRot();");
   }
   UnoKartenStapelFarbe = "ROT";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHR.png'>";
+  UnoKartenStapel = "FARBWUNSCH";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHR.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
-function WunschBlau()
+async function WunschBlau()
 {
   if (CONLOG == true) {
     console.log("WunschBlau();");
   }
   UnoKartenStapelFarbe = "BLAU";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHB.png'>";
+  UnoKartenStapel = "FARBWUNSCH";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHB.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
-function WunschGrün()
+async function WunschGrün()
 {
   if (CONLOG == true) {
     console.log("WunschGrün();");
   }
   UnoKartenStapelFarbe = "GRÜN";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGR.png'>";
+  UnoKartenStapel = "FARBWUNSCH";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGR.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
@@ -1590,8 +1712,10 @@ async function WunschGelb()
     console.log("WunschGelb();");
   }
   UnoKartenStapelFarbe = "GELB";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGE.png'>";
+  UnoKartenStapel = "FARBWUNSCH";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGE.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
@@ -1601,8 +1725,10 @@ async function WunschRotPlus4()
     console.log("WunschRotPlus4();");
   }
   UnoKartenStapelFarbe = "ROT";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4R.png'>";
+  UnoKartenStapel = "+4";
+  ////Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4R.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
@@ -1612,8 +1738,10 @@ async function WunschBlauPlus4()
     console.log("WunschBlauPlus4();");
   }
   UnoKartenStapelFarbe = "BLAU";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4B.png'>";
+  UnoKartenStapel = "+4";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4B.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
@@ -1623,8 +1751,10 @@ async function WunschGrünPlus4()
     console.log("WunschGrünPlus4();");
   }
   UnoKartenStapelFarbe = "GRÜN";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GR.png'>";
+  UnoKartenStapel = "+4";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GR.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
@@ -1636,14 +1766,16 @@ async function WunschGelbPlus4()
     console.log("WunschGelbPlus4();");
   }
   UnoKartenStapelFarbe = "GELB";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GE.png'>";
+  UnoKartenStapel = "+4";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GE.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
 let inputname;
 let won;
-let Kartenstapel = document.getElementById("UnoStapel");
+var Kartenstapel = document.getElementById("UnoStapel");
 
 function K() {
   console.log("Karte 1-9: 1-9\nKarte 10: Farbe\nKarte 11: NOKARTE\nKarte 12: Richtungswechsel\nKarte 13: +2\nKarte 14: +4\nFarbe 1: Rot\nFarbe 2: Blau\nFarbe 3: Gelb\nFarbe 4: Grün");

@@ -95,7 +95,13 @@ let Spielernamen;
 async function NameVonSQL()
 {
   await dat("CREATE TABLE IF NOT EXISTS spielernamen (Spieler1 VARCHAR(255), Spieler2 VARCHAR(255));");
-  Spielernamen = await dat("SELECT * FROM server"+belegt2+";");
+  try {
+    Spielernamen = await dat("SELECT * FROM server"+belegt2+";");
+  } catch (e) {
+    throw e;
+    alert("FEHLER! Server unbekannt. Biite erneut versuchen\n\n Fehlermeldung: "+e);
+    document.location.href="./index.html";
+  }
   Spieler1Name = Spielernamen[0].Spieler1Name;
   Spieler2Name = Spielernamen[0].Spieler2Name;
   Spielernamen = [Spieler1Name, Spieler2Name];
@@ -196,7 +202,7 @@ async function UnoStart() {
   document.getElementById("Spieler1NameFeld").innerHTML+= Spielernamen[0];
   document.getElementById("Spieler2NameFeld").innerHTML+= Spielernamen[1];
   Verbieten();
-  DownloadLoop(500);
+  DownloadLoop(1000);
   await WarteAufSP1();
   //await OwO();
   //await ETZ();
@@ -251,19 +257,35 @@ function LOG()
 //
 // }
 
+let Loopstop = false;
 async function DownloadLoop(looptime)
 {
-  while (true) {
-    await Sleep(looptime);
-    await Download();
-    graphic();
+  if (looptime == undefined) {
+    throw "Bitte geb Parameter mit an";
   }
+  else {
+    while (!Loopstop) {
+      await Sleep(looptime);
+      await Download();
+      graphic();
+  }
+
+  }
+}
+
+async function StopLoop() {
+  Loopstop = true;
+  await Sleep(1500);
+  Loopstop = false;
 }
 
 async function Download() {
   return new Promise(async (resolve, reject) =>
 {
   let ascx = await dat("SELECT * FROM server"+belegt2+";");
+  if (CONLOG) {
+    console.warn(ascx);
+  }
   while (ascx[0].Spieler1Karten == "") {
     await Sleep(200);
     ascx = await dat("SELECT * FROM server"+belegt2+";");
@@ -279,6 +301,8 @@ async function Download() {
   } catch (e)
   {
     throw e;
+    //await Download();
+    graphic();
     ascx = await dat("SELECT * FROM server"+belegt2+";");
     Spieler1Karten = ascx[0].Spieler1Karten.split(",");
     Spieler1KartenFarbe = ascx[0].Spieler1KartenFarbe.split(",");
@@ -324,7 +348,12 @@ async function Upload()
   return new Promise(async (resolve, reject) =>
 {
   Zug = 1;
-  await dat("UPDATE server"+belegt2+" SET Spieler1Karten='"+Spieler1Karten.toString()+"', Spieler1KartenFarbe='"+Spieler1KartenFarbe.toString()+"', Spieler2Karten='"+Spieler2Karten.toString()+"', Spieler2KartenFarbe='"+Spieler2KartenFarbe.toString()+"', Zug = '"+Zug+"';");
+  if (UnoKartenStapel == "RICHTUNGSWECHSEL" || UnoKartenStapel == "NOKARTE") {
+    Zug = 2;
+  }
+  let StapelUp = {"Kartenstapel":UnoKartenStapel, "KartenstapelFarbe":UnoKartenStapelFarbe};
+  console.log("UPDATE server"+belegt2+" SET Spieler1Karten='"+Spieler1Karten.toString()+"', Spieler1KartenFarbe='"+Spieler1KartenFarbe.toString()+"', Spieler2Karten='"+Spieler2Karten.toString()+"', KartenStapel = '"+JSON.stringify(StapelUp)+"', Spieler2KartenFarbe='"+Spieler2KartenFarbe.toString()+"', Zug = '"+Zug+"';");
+  await dat("UPDATE server"+belegt2+" SET Spieler1Karten='"+Spieler1Karten.toString()+"', Spieler1KartenFarbe='"+Spieler1KartenFarbe.toString()+"', Spieler2Karten='"+Spieler2Karten.toString()+"', KartenStapel = '"+JSON.stringify(StapelUp)+"', Spieler2KartenFarbe='"+Spieler2KartenFarbe.toString()+"', Zug = '"+Zug+"';");
   resolve();
 });
 }
@@ -347,7 +376,7 @@ async function graphic()
      SC1.innerHTML = "";
      SC2.innerHTML = "";
      for (var i = 0; i < Spieler1Karten.length; i++) {
-       SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+       SC1.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
      }
 
      for (var i = 0; i < Spieler2Karten.length; i++)
@@ -533,7 +562,8 @@ async function Legen(Karte)
     }
     await Spieler2KartenFarbe.splice(Karte,1);
     await Spieler2Karten.splice(Karte,1);
-    await dat("UPDATE server"+belegt2+" SET Spieler1Karten = '"+Spieler1Karten.toString()+"', Spieler1KartenFarbe = '"+Spieler1KartenFarbe.toString()+"', Spieler2Karten = '"+Spieler2Karten.toString()+"', Spieler2KartenFarbe = '"+Spieler2KartenFarbe.toString()+"';");
+    // await dat("UPDATE server"+belegt2+" SET Spieler1Karten = '"+Spieler1Karten.toString()+"', Spieler1KartenFarbe = '"+Spieler1KartenFarbe.toString()+"', Spieler2Karten = '"+Spieler2Karten.toString()+"', Spieler2KartenFarbe = '"+Spieler2KartenFarbe.toString()+"';");
+      await Upload();
   }
   else {
     if (welcherSpieler == 1) {
@@ -664,9 +694,17 @@ async function Tausch()
   tmp2 = Spieler2KartenFarbe;
   Spieler2KartenFarbe = Spieler1KartenFarbe;
   Spieler1KartenFarbe = tmp2;
-  await dat("UPDATE server"+belegt2+" SET Spieler1Karten='"+Spieler1Karten+"', Spieler2KartenFarbe='"+Spieler1KartenFarbe+"', Spieler2Karten='"+Spieler2Karten+"', Spieler2KartenFarbe='"+Spieler2KartenFarbe+"';");
-  //await Sleep(100);
-  graphic();
+  if (Multiplayer) {
+    await Upload();
+    graphic();
+    weiter();
+
+  }
+  else {
+    graphic();
+  }
+
+
 }
 
 //let owo;
@@ -789,11 +827,13 @@ function LogLog(text)
 
 async function weiter()
 {
+
   //löschen("TransID"-1);
   document.querySelectorAll('.tra').forEach(function(a){
 a.remove()
 })
   if (Multiplayer) {
+    await Upload();
     let zuu = await dat("SELECT * FROM server"+belegt2+";");
     Spieler2Karten = await zuu[0].Spieler2Karten.split(",");
     Spieler2KartenFarbe = await zuu[0].Spieler2KartenFarbe.split(",");
@@ -809,7 +849,7 @@ a.remove()
     SC2.innerHTML = "";
     SC1.innerHTML = "";
     for (var i = 0; i < Spieler1Karten.length; i++) {
-      SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+      SC1.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
     }
     graphic();
     document.getElementById("Ziehen").removeAttribute("disabled", "");
@@ -818,6 +858,76 @@ a.remove()
     $("#FARBWUNSCH_WAHLPLUS4").hide();
     await Upload();
     await WaitForPlayerOne();
+  }
+}
+
+
+var lastMessage;
+
+async function preSend() {
+    if(event.key === 'Enter') {
+      if (document.getElementById("chatEingabe") == "") {
+        return;
+        //Breche ab, wenn nicht eingegeben wurde
+      }
+      else {
+        await dat("UPDATE server"+belegt2+" SET SP2typing = false");
+        await ChatSend();
+        document.getElementById("chatEingabe").value = "";
+      }
+    }
+    else {
+      await dat("UPDATE server"+belegt2+" SET SP2typing = true");
+    }
+}
+document.addEventListener('keypress', preSend);
+
+async function ChatSend()
+{
+  return new Promise( async (resolve, reject) =>
+  {
+    if (Multiplayer) {
+      await dat("UPDATE server"+belegt2+" SET chat = '"+Spielernamen[1]+": "+document.getElementById("chatEingabe").value+"';");
+    }
+  });
+}
+
+async function ChatGet()
+{
+  if (Multiplayer) {
+
+    let isTyping = await dat("SELECT SP1typing from server"+belegt2+";");
+    isTyping = isTyping[0].SP1typing;
+    if (isTyping) {
+      document.getElementById("isTyping").innerHTML = Spielernamen[0]+" schreibt...";
+    }
+    else {
+      document.getElementById("isTyping").innerHTML = "";
+    }
+    let msg = await dat("SELECT chat from server"+belegt2);
+    msg = msg[0].chat;
+    console.log(msg);
+    if (msg != lastMessage)
+    {
+      lastMessage = msg;
+      document.getElementById("chat").innerHTML += "<br>"+lastMessage;
+    }
+  }
+}
+
+async function check()
+{
+  while (true)
+  {
+    ChatGet();
+    let tmp2 = document.getElementById("chatEingabe").value;
+    await Sleep(2000);
+    if (tmp2 != document.getElementById("chatEingabe").value) {
+      await dat("UPDATE server"+belegt2+" SET SP2typing = TRUE;");
+    }
+    else {
+      await dat("UPDATE server"+belegt2+" SET SP2typing = FALSE;");
+    }
   }
 }
 
@@ -838,7 +948,7 @@ async function weiters()
   SC1.innerHTML = "";
   if (Multiplayer) {
     for (var i = 0; i < Spieler1Karten.length; i++) {
-      SC1.innerHTML += "<img src='./img/Uno/Karten/Rückseite.png'>";
+      SC1.innerHTML += "<img src='./img/Uno/Karten/Ruckseite.png'>";
     }
     graphic();
   }
@@ -865,19 +975,21 @@ async function KarteZiehen()
   if (CONLOG == true) {
     console.log("KarteZiehen();");
   }
+  document.getElementById("Ziehen").setAttribute("disabled", "");
+  document.getElementById("KarteLegen").removeAttribute("disabled", "");
+  document.getElementById("RundeBeenden").removeAttribute("disabled", "");
   if (Multiplayer)
   {
+    await StopLoop();
     Spieler2Karten.push(await Random(14));
     Spieler2KartenFarbe.push(await RandomFarbe(3));
     await convert();
     await invalid();
-    await dat("UPDATE server"+belegt2+" SET Spieler2Karten = "+Spieler2Karten.toString());
-    await dat("UPDATE server"+belegt2+" SET Spieler2KartenFarbe = "+Spieler2KartenFarbe.toString());
+    await Upload();
+    await DownloadLoop(1000);
   }
   graphic();
-  document.getElementById("Ziehen").setAttribute("disabled", "");
-  document.getElementById("KarteLegen").removeAttribute("disabled", "");
-  document.getElementById("RundeBeenden").removeAttribute("disabled", "");
+
 }
 
 
@@ -917,116 +1029,116 @@ async function KarteZiehen()
 //
 // }
 
-// async function convert() {
-//   if (CONLOG == true) {
-//     console.log("convert();");
-//   }
-//   for (let g = 0; g < 100; g++) {                                             //100 Mal, damit JEDE Karte konvertiert nicht, nicht immer nur die erste
-//     Spieler2Karten = Spieler2Karten.toString().replace(/10/i, "FARBWUNSCH_"); //Ersetzt Karte 10 mit FARBWUNSCH!!! NOCH NICHT KONVERTIERT! SIEHE: INVALID()
-//     Spieler2Karten = Spieler2Karten.toString().replace(/11/i, "NOKARTE");
-//     Spieler2Karten = Spieler2Karten.toString().replace(/12/i, "RICHTUNGSWECHSEL");
-//     Spieler2Karten = Spieler2Karten.toString().replace(/13/i, "+2");
-//     Spieler2Karten = Spieler2Karten.toString().replace(/14/i, "+4_");         //NOCH NICHT KONVERTIERT! SIEHE: INVALID()
-//   }
-//
-//     await Sleep(10);
-//     Spieler2Karten = Spieler2Karten.split(",");
-//
-// for (let f = 0; f < 100; f++) {
-//   Spieler1Karten = Spieler1Karten.toString().replace(/10/i, "FARBWUNSCH_"); //NOCH NICHT KONVERTIERT! SIEHE: INVALID()
-//   Spieler1Karten = Spieler1Karten.toString().replace(/11/i, "NOKARTE");
-//   Spieler1Karten = Spieler1Karten.toString().replace(/12/i, "RICHTUNGSWECHSEL");
-//   Spieler1Karten = Spieler1Karten.toString().replace(/13/i, "+2");
-//   Spieler1Karten = Spieler1Karten.toString().replace(/14/i, "+4_"); //NOCH NICHT KONVERTIERT! SIEHE: INVALID()
-// }
-//
-//     await Sleep(10);
-//     Spieler1Karten = Spieler1Karten.split(",");
-// }
+async function convert() {
+  if (CONLOG == true) {
+    console.log("convert();");
+  }
+  for (let g = 0; g < 100; g++) {                                             //100 Mal, damit JEDE Karte konvertiert nicht, nicht immer nur die erste
+    Spieler2Karten = Spieler2Karten.toString().replace(/10/i, "FARBWUNSCH_"); //Ersetzt Karte 10 mit FARBWUNSCH!!! NOCH NICHT KONVERTIERT! SIEHE: INVALID()
+    Spieler2Karten = Spieler2Karten.toString().replace(/11/i, "NOKARTE");
+    Spieler2Karten = Spieler2Karten.toString().replace(/12/i, "RICHTUNGSWECHSEL");
+    Spieler2Karten = Spieler2Karten.toString().replace(/13/i, "+2");
+    Spieler2Karten = Spieler2Karten.toString().replace(/14/i, "+4_");         //NOCH NICHT KONVERTIERT! SIEHE: INVALID()
+  }
+
+    //await Sleep(10);
+    Spieler2Karten = Spieler2Karten.split(",");
+
+for (let f = 0; f < 100; f++) {
+  Spieler1Karten = Spieler1Karten.toString().replace(/10/i, "FARBWUNSCH_"); //NOCH NICHT KONVERTIERT! SIEHE: INVALID()
+  Spieler1Karten = Spieler1Karten.toString().replace(/11/i, "NOKARTE");
+  Spieler1Karten = Spieler1Karten.toString().replace(/12/i, "RICHTUNGSWECHSEL");
+  Spieler1Karten = Spieler1Karten.toString().replace(/13/i, "+2");
+  Spieler1Karten = Spieler1Karten.toString().replace(/14/i, "+4_"); //NOCH NICHT KONVERTIERT! SIEHE: INVALID()
+}
+
+    //await Sleep(10);
+    Spieler1Karten = Spieler1Karten.split(",");
+}
 
 
-// async function invalid()
-// {
-//   if (CONLOG == true) {
-//     console.log("invalid();");
-//   }
-//   let ver;
-//   for (let x = 0; x < Spieler2Karten.length; x++) {
-//     ver = Spieler2Karten.indexOf("FARBWUNSCH_");
-//     console.log(ver);
-//     if(ver == "-1")
-//     {
-//       //console.log("Kein Farbwunsch enthalten");
-//     }
-//     else {
-//       //console.log(ver);
-//       await Spieler2KartenFarbe.splice(ver,1,"0");
-//       await Spieler2Karten.splice(ver,1,"FARBWUNSCH"); //ERSETZT FARBWUNSCH_ MIT FARBWUNSCH, DAMIT ALLE FARBWÜNSCHE BEARBEITET WERDEN
-//     }
-//
-//     ver = Spieler2Karten.indexOf("+4_");
-//     if (ver == "-1") {
-//       //console.log("Keine +4 enthalten");
-//     }
-//     else {
-//       //console.log(ver);
-//       Spieler2KartenFarbe.splice(ver,1,"0");
-//       Spieler2Karten.splice(ver,1,"+4");
-//     }
-//   }
-//   for (let x = 0; x < Spieler1Karten.length; x++) {
-//     ver = 0;
-//     ver = Spieler1Karten.indexOf("FARBWUNSCH_");
-//     if(ver == "-1")
-//     {
-//       //console.log("Kein Farbwunsch enthalten");
-//     }
-//     else {
-//       //console.log(ver);
-//       await Spieler1KartenFarbe.splice(ver,1,"0");
-//       await Spieler1Karten.splice(ver,1,"FARBWUNSCH"); //ERSETZT FARBWUNSCH_ MIT FARBWUNSCH, DAMIT ALLE FARBWÜNSCHE BEARBEITET WERDEN
-//     }
-//
-//     ver = Spieler1Karten.indexOf("+4_");
-//     if (ver == "-1") {
-//       //console.log("Keine +4 enthalten");
-//     }
-//     else {
-//       //console.log(ver);
-//       await Spieler1KartenFarbe.splice(ver,1,"0");
-//       await Spieler1Karten.splice(ver,1,"+4");
-//     }
-//   }
-// }
+async function invalid()
+{
+  if (CONLOG == true) {
+    console.log("invalid();");
+  }
+  let ver;
+  for (let x = 0; x < Spieler2Karten.length; x++) {
+    ver = Spieler2Karten.indexOf("FARBWUNSCH_");
+    console.log(ver);
+    if(ver == "-1")
+    {
+      //console.log("Kein Farbwunsch enthalten");
+    }
+    else {
+      //console.log(ver);
+      await Spieler2KartenFarbe.splice(ver,1,"0");
+      await Spieler2Karten.splice(ver,1,"FARBWUNSCH"); //ERSETZT FARBWUNSCH_ MIT FARBWUNSCH, DAMIT ALLE FARBWÜNSCHE BEARBEITET WERDEN
+    }
 
-// function tst() {
-//   if (CONLOG == true) {
-//     console.log("tst();");
-//   }
-//   for(let z=0; z < Spieler2Karten.length; z++)
-//   {
-//     Spieler2Karten[z] = "FARBWUNSCH";
-//   }
-// }
+    ver = Spieler2Karten.indexOf("+4_");
+    if (ver == "-1") {
+      //console.log("Keine +4 enthalten");
+    }
+    else {
+      //console.log(ver);
+      Spieler2KartenFarbe.splice(ver,1,"0");
+      Spieler2Karten.splice(ver,1,"+4");
+    }
+  }
+  for (let x = 0; x < Spieler1Karten.length; x++) {
+    ver = 0;
+    ver = Spieler1Karten.indexOf("FARBWUNSCH_");
+    if(ver == "-1")
+    {
+      //console.log("Kein Farbwunsch enthalten");
+    }
+    else {
+      //console.log(ver);
+      await Spieler1KartenFarbe.splice(ver,1,"0");
+      await Spieler1Karten.splice(ver,1,"FARBWUNSCH"); //ERSETZT FARBWUNSCH_ MIT FARBWUNSCH, DAMIT ALLE FARBWÜNSCHE BEARBEITET WERDEN
+    }
+
+    ver = Spieler1Karten.indexOf("+4_");
+    if (ver == "-1") {
+      //console.log("Keine +4 enthalten");
+    }
+    else {
+      //console.log(ver);
+      await Spieler1KartenFarbe.splice(ver,1,"0");
+      await Spieler1Karten.splice(ver,1,"+4");
+    }
+  }
+}
+
+function tst() {
+  if (CONLOG == true) {
+    console.log("tst();");
+  }
+  for(let z=0; z < Spieler2Karten.length; z++)
+  {
+    Spieler2Karten[z] = "FARBWUNSCH";
+  }
+}
 
 let UnoKartenStapel;
 let UnoKartenStapelFarbe;
 
-// function ETZ()
-// {
-//   if (CONLOG == true) {
-//     console.log("ETZ();");
-//   }
-//   console.log("\n\nKarten von "+Spieler1Name+": ");
-//   for (i = 0; i<=6; i++) {
-//     console.log(Spieler2Karten[i] + " " + Spieler2KartenFarbe[i] + "\n" );
-//   }
-//
-//   console.log("\n\nKarten von "+Spieler2Name+": ");
-//   for (i = 0; i<=6; i++) {
-//     console.log(Spieler1Karten[i] + " " + Spieler1KartenFarbe[i] + "\n" );
-//   }
-// }
+function ETZ()
+{
+  if (CONLOG == true) {
+    console.log("ETZ();");
+  }
+  console.log("\n\nKarten von "+Spielernamen[1]+": ");
+  for (i = 0; i<=6; i++) {
+    console.log(Spieler2Karten[i] + " " + Spieler2KartenFarbe[i] + "\n" );
+  }
+
+  console.log("\n\nKarten von "+Spielernamen[0]+": ");
+  for (i = 0; i<=6; i++) {
+    console.log(Spieler1Karten[i] + " " + Spieler1KartenFarbe[i] + "\n" );
+  }
+}
 
 // async function FirstCardF() {
 //   if (CONLOG == true) {
@@ -1054,7 +1166,7 @@ let UnoKartenStapelFarbe;
 // }
 //
 // }
-
+var Kartenstapel = document.getElementById("UnoStapel");
 
 async function StapelUpdate()
 {
@@ -1145,7 +1257,12 @@ async function StapelUpdate()
       case "BLAU": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WB.png'>"; break;
     } break;
 
-    case "FARBWUNSCH": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCH.png'>"; break;
+    case "FARBWUNSCH": switch (UnoKartenStapelFarbe) {
+      case "ROT": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHR.png'>"; break;
+      case "GELB": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGE.png'>"; break;
+      case "GRÜN": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGR.png'>"; break;
+      case "BLAU": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHB.png'>"; break;
+    } break;
 
     case "+2": switch (UnoKartenStapelFarbe) {
       case "ROT": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/+2R.png'>"; break;
@@ -1154,7 +1271,12 @@ async function StapelUpdate()
       case "BLAU": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/+2B.png'>"; break;
     } break;
 
-    case "+4": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/+4.png'>"; break;
+    case "+4": switch (UnoKartenStapelFarbe) {
+      case "ROT": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4R.png'>"; break;
+      case "GELB": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GE.png'>"; break;
+      case "GRÜN": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GR.png'>"; break;
+      case "BLAU": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4B.png'>"; break;
+    } break;
 
     case "NOKARTE": switch (UnoKartenStapelFarbe) {
       case "ROT": Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/NOR.png'>"; break;
@@ -1166,102 +1288,118 @@ async function StapelUpdate()
   }
   return 0;
 }
+Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCH.png'>";
 
-
-function WunschRot()
+async function WunschRot()
 {
   if (CONLOG == true) {
     console.log("WunschRot();");
   }
   UnoKartenStapelFarbe = "ROT";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHR.png'>";
+  UnoKartenStapel = "FARBWUNSCH";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHR.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
-function WunschBlau()
+async function WunschBlau()
 {
   if (CONLOG == true) {
     console.log("WunschBlau();");
   }
   UnoKartenStapelFarbe = "BLAU";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHB.png'>";
+  UnoKartenStapel = "FARBWUNSCH";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHB.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
-function WunschGrün()
+async function WunschGrün()
 {
   if (CONLOG == true) {
     console.log("WunschGrün();");
   }
   UnoKartenStapelFarbe = "GRÜN";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGR.png'>";
+  UnoKartenStapel = "FARBWUNSCH";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGR.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
 
-function WunschGelb()
+async function WunschGelb()
 {
   if (CONLOG == true) {
     console.log("WunschGelb();");
   }
   UnoKartenStapelFarbe = "GELB";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGE.png'>";
+  UnoKartenStapel = "FARBWUNSCH";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/WUNSCHGE.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
-function WunschRotPlus4()
+async function WunschRotPlus4()
 {
   if (CONLOG == true) {
     console.log("WunschRotPlus4();");
   }
   UnoKartenStapelFarbe = "ROT";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4R.png'>";
+  UnoKartenStapel = "+4";
+  ////Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4R.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
-function WunschBlauPlus4()
+async function WunschBlauPlus4()
 {
   if (CONLOG == true) {
     console.log("WunschBlauPlus4();");
   }
   UnoKartenStapelFarbe = "BLAU";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4B.png'>";
+  UnoKartenStapel = "+4";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4B.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
-function WunschGrünPlus4()
+async function WunschGrünPlus4()
 {
   if (CONLOG == true) {
     console.log("WunschGrünPlus4();");
   }
   UnoKartenStapelFarbe = "GRÜN";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GR.png'>";
+  UnoKartenStapel = "+4";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GR.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
 $("Spieler1Name").hide();
 
-function WunschGelbPlus4()
+async function WunschGelbPlus4()
 {
   if (CONLOG == true) {
     console.log("WunschGelbPlus4();");
   }
   UnoKartenStapelFarbe = "GELB";
-  Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GE.png'>";
+  UnoKartenStapel = "+4";
+  //Kartenstapel.innerHTML = "<img src='./img/Uno/Karten/PLUS4GE.png'>";
   $("#FARBWUNSCH_WAHL").hide();
+  await Upload();
   weiter();
 }
 
 let inputname;
 let won;
-let Kartenstapel = document.getElementById("UnoStapel");
+
 
 function K() {
   console.log("Karte 1-9: 1-9\nKarte 10: Farbe\nKarte 11: NOKARTE\nKarte 12: Richtungswechsel\nKarte 13: +2\nKarte 14: +4\nFarbe 1: Rot\nFarbe 2: Blau\nFarbe 3: Gelb\nFarbe 4: Grün");

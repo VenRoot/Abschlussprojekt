@@ -43,7 +43,7 @@ async function register()
     }
 
     else {
-      await dat("INSERT INTO users VALUES('"+document.getElementById("usernameinput").value+"', '"+md5(document.getElementById("passwordinput").value)+"');");
+      await dat("INSERT INTO users VALUES('"+document.getElementById("usernameinput").value+"', '"+md5(document.getElementById("passwordinput").value)+"', '"+Benutzername+"', NOW());");
       JSAlert.alert("Registrierung erfolgreich!");
       prelogin();
     }
@@ -197,10 +197,15 @@ async function LoadServer()
 
 async function BetreteServer(Server)
 {
-  await fs.writeFileSync('./js/welcherServer.txt', Server, (err) => {if (err) throw err;});
-  //await dat("INSERT INTO placeholder SET Server = "+Server+", IP = '"+IPAdresse+"';");
-  await dat("UPDATE server"+Server+" SET Spieler2Name = '"+preuser[0].username+"', Spieler2IP = '"+IPAdresse+"', FULL = TRUE;");
-  document.location.href = "./UnoGast.html";
+  if (isUserLoggedIn) {
+    await fs.writeFileSync(__dirname+'/js/welcherServer.txt', Server, (err) => {if (err) throw err;});
+    //await dat("INSERT INTO placeholder SET Server = "+Server+", IP = '"+IPAdresse+"';");
+    await dat("UPDATE server"+Server+" SET Spieler2Name = '"+preuser[0].username+"', Spieler2IP = '"+IPAdresse+"', FULL = TRUE;");
+    document.location.href = "./UnoGast.html";
+  }
+  else {
+    JSAlert.alert("Du bist nicht eingeloggt");
+  }
 }
 
 async function Server1Sim()
@@ -396,12 +401,12 @@ async function UnoStartHM()
       console.log(TEMPSpielerDaten);
       await JSAlert.alert("Ihre PIN lautet: "+PIN+"\nBitte schreiben sie sich auf, sie brauchen sie, um sich einzuloggen", null, JSAlert.Icons.Warning).then(async function(){
 
-        if (await fs.existsSync("/usr/guest/"+document.getElementById("Spieler1NameFeldHM").value+"/Uno.dat")) {
+        if (await fs.existsSync(__dirname+"/usr/guest/"+document.getElementById("Spieler1NameFeldHM").value+"/Uno.dat")) {
           if (confirm("Dieser Nutzer hat schon einen aktiven Spielerstand! Möchten Sie sich anmelden?")) {
             JSAlert.prompt("Geben Sie Ihre PIN ein").then(function(result) {
               if (!result)
                   return;
-              let request = fs.readFile("/usr/guest/"+document.getElementById("Spieler1NameFeldHM").value+"/Uno.dat", {encoding: 'utf-8'}, async function(err)
+              let request = fs.readFileSync(__dirname+"/usr/guest/"+document.getElementById("Spieler1NameFeldHM").value+"/Uno.dat", {encoding: 'utf-8'}, async function(err)
               {
                 if (err) throw err;
                 if (request.Daten[0].PIN == result)
@@ -417,7 +422,7 @@ async function UnoStartHM()
           await new Promise(resolve, async function() {
             await cmd.run("mkdir .\\usr\\guest\\"+document.getElementById("Spieler1NameFeldHM").value);
             await cmd.run("echo hi > .\\usr\\guest\\"+document.getElementById("Spieler1NameFeldHM").value)
-          }).then(fs.writeFileSync('/usr/guest/'+document.getElementById("Spieler1NameFeldHM").value+'/Uno.dat', TEMPSpielerDaten, (err) => {
+          }).then(fs.writeFileSync(__dirname+'/usr/guest/'+document.getElementById("Spieler1NameFeldHM").value+'/Uno.dat', TEMPSpielerDaten, (err) => {
           if (err) throw err;
           }));
 
